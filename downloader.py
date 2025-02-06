@@ -10,11 +10,19 @@ class TikTokDownloader:
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.5', 'Connection': 'keep-alive', }
+            'Accept-Language': 'en-US,en;q=0.5', 'Connection': 'keep-alive'}
         self.session = requests.Session()
 
-    def _get_download_url(self, url: str):
-        """Get the actual watermark-free video download URL."""
+    def _get_download_url(self, url: str) -> str:
+        """
+        Retrieves the direct download URL of a video from the given web page URL.
+        It makes an HTTP request, searches for video URLs in the page source, cleans up
+        the URL, and returns the download link.
+
+        :param url: The URL of the page containing the video.
+        :return: A string with the video download URL.
+        :raises Exception: If there is an error fetching or processing the URL.
+        """
         try:
             # First get the HTML page
             response = self.session.get(url, headers=self.headers)
@@ -56,8 +64,30 @@ class TikTokDownloader:
         tiktok_pattern = r'https?://((?:vm|vt|www|v)\.)?tiktok(?:v)?\.com/.*'
         return bool(re.match(tiktok_pattern, url))
 
-    def download(self, url, output_path, on_progress: Callable[[int, int], None] = None, block_size=1024, delay=1):
-        """Download TikTok video to specified path without watermark."""
+    def download(self, url: str, output_path: str, on_progress: Callable[[int, int], None] = None,
+                 block_size: int = 1024, delay: int = 1) -> dict[str, any]:
+        """
+        Downloads the video from the given TikTok URL and saves it to the specified output path.
+        The function optionally reports download progress through the `on_progress` callback and allows configuring
+        the block size for downloading the file in chunks. Additionally, a delay can be set between each request to reduce server load.
+
+        :param url: The URL of the video to download.
+        :param output_path: The file path where the downloaded content will be saved.
+        :param on_progress: (Optional) A callback function that will be called with the number of bytes downloaded
+                             and the total size of the file. The callback signature should be `on_progress(bytes_downloaded, total_size)`.
+                             This parameter can be used to display or track download progress.
+        :param block_size: (Optional) The size of each chunk of data to download in bytes. Default is 1024 bytes (1 KB).
+                            A larger block size may increase download speed but use more memory.
+        :param delay: (Optional) The delay in seconds between the request. Default is 1 second.
+                      This can be used to reduce server load.
+
+        :return: A dictionary with keys related to the download status. The dictionary can contain:
+                 - 'success': A boolean indicating the result of the download process.
+                 - 'path': The file path where the downloaded content is saved.
+                 - 'url': The downloaded videos url.
+                 - 'size': (Optional) The total size of the file downloaded if the download succeeds.
+                 - 'error': (Optional) An error message if the download fails.
+        """
         try:
             # Get video download URL
             video_url = self._get_download_url(url)
@@ -86,18 +116,3 @@ class TikTokDownloader:
 
         except Exception as e:
             return {'success': False, 'error': str(e), 'url': url}
-
-
-if __name__ == '__main__':
-    # Create an instance
-    downloader = TikTokDownloader()
-
-
-    def on_progress(downloaded, total):
-        print(f"Downloaded: {downloaded} / {total}")
-        print(f"Progress: {(downloaded / total) * 100:.2f}%")
-
-
-    # Download a video (replace with your desired TikTok video URL)
-    r = downloader.download("https://www.tiktok.com/@username/video/xxxxxxxxxxxxxxxxx", "output_video.mp4", on_progress)
-    print(r)

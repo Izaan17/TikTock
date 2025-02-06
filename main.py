@@ -1,5 +1,3 @@
-# TikTock:
-# An app that allows you to download all of your favorite videos before TikTok gets deleted.
 import argparse
 import os.path
 
@@ -9,6 +7,10 @@ from extractor import VideoUrlExtractor
 
 
 def create_parser() -> argparse.ArgumentParser:
+    """
+    Creates the parser with arguments.
+    :return: The configured parser
+    """
     parser = argparse.ArgumentParser(description="TikTok Video Downloader")
 
     # Positional arguments for URLs
@@ -25,7 +27,15 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _download(args, tiktok_downloader: TikTokDownloader, urls):
+def _download(args: argparse.Namespace, tiktok_downloader: TikTokDownloader, urls: list[str]) -> None:
+    """
+    Wrapper function for downloading TikTok videos.
+    :param args:
+    :param tiktok_downloader:
+    :param urls:
+    :return:
+    """
+
     def on_progress(downloaded, total):
         progress = (downloaded / total) * 100
         status = '~' if downloaded != total else '✓'
@@ -35,23 +45,26 @@ def _download(args, tiktok_downloader: TikTokDownloader, urls):
             print()
 
     for i, url in enumerate(urls, start=1):
-        # Print initial download information before attempting download
         print(f"==> Downloading [{i}/{len(urls)}] {url}")
-
-        response = tiktok_downloader.download(url, output_path=os.path.join(args.output, f"{url.split('/')[-2]}.mp4"),
+        tiktok_id = f"{url.split('/')[-2]}"
+        response = tiktok_downloader.download(url, output_path=os.path.join(args.output, f"{tiktok_id}.mp4"),
                                               on_progress=on_progress)
 
         # Print status, error (if any), path, and size after download
         success = 'Success' if response.get('success', None) else 'Failed'
-        error = f"Error: {response.get('error', '')} |" if response.get('error') else ''
+        error = f"Error: {response.get('error', '')} | " if response.get('error') else ''
         path = response.get('path', 'No path given')
         size = response.get('size')
 
-        print(f"Status: {success} | {error} Output: {path} | Size: {size} |")
+        print(f"Status: {success} | {error}Output: {path} | Size: {size} |")
         print()
 
 
-def main():
+def main() -> None:
+    """
+    The entry point of the program.
+    :return: None
+    """
     parser = create_parser()
     args = parser.parse_args()
     tiktok_downloader = TikTokDownloader()

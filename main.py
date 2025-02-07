@@ -1,9 +1,11 @@
 import argparse
+import json
 import os.path
 
 from arg_types import dir_type
 from downloader import TikTokDownloader
-from extractor import VideoUrlExtractor
+from extractors import TikTokActivityType, JSONExtractor, TextExtractor
+from utils import select_from_choices
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -27,13 +29,13 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _download(args: argparse.Namespace, tiktok_downloader: TikTokDownloader, urls: list[str]) -> None:
+def download(args: argparse.Namespace, tiktok_downloader: TikTokDownloader, urls: list[str]) -> None:
     """
     Wrapper function for downloading TikTok videos.
-    :param args:
-    :param tiktok_downloader:
-    :param urls:
-    :return:
+    :param args: The argparse namespace
+    :param tiktok_downloader: The TikTok downloader instance
+    :param urls: The urls to download
+    :return: None
     """
 
     def on_progress(downloaded, total):
@@ -58,6 +60,53 @@ def _download(args: argparse.Namespace, tiktok_downloader: TikTokDownloader, url
 
         print(f"Status: {success} | {error}Output: {path} | Size: {size} |")
         print()
+
+
+def extract_urls_from_file(file_handler) -> list[str]:
+    """
+    Wrapper class for extracting urls to each specified format
+    :param file_handler: The file handler
+    :return: A list of a valid TikTok URLs based on the file handlers file extension
+    """
+    file_ext = os.path.splitext(file_handler.name)[1].lower()
+
+    if file_ext == '.json':
+        return handle_json_file(file_handler)
+    elif file_ext == '.txt':
+        return handle_txt_file(file_handler)
+    else:
+        raise ValueError(f"Unsupported file type '{file_ext}'")
+
+
+def handle_json_file(file_handler) -> list[str]:
+    """
+    The wrapper class for extracting TikTok video URLs from a json file
+    :param file_handler: The file handler
+    :return: A list of valid TikTok URLs
+    """
+    json_extractor = JSONExtractor()
+    json_data = json.load(file_handler)
+
+    if json_extractor.is_tiktok_format(json_data):
+        selected_activities = select_from_choices("Select TikTok activities:", TikTokActivityType.get_all_types(),
+                                                  allow_multiple=True)
+        selected_activities = [TikTokActivityType.from_string(activity) for activity in selected_activities]
+
+        # Flattening using list comprehension
+        return [item for activity in selected_activities for item in
+                json_extractor.extract_from_tiktok_format(json_data, activity)]
+
+    return json_extractor.extract_from_custom_json_format(file_handler)
+
+
+def handle_txt_file(file_handler) -> list[str]:
+    """
+    The wrapper class for extracting TikTok video URLs from a text file
+    :param file_handler: The file handler
+    :return: A list of valid TikTok URLs
+    """
+    extractor = TextExtractor()
+    return extractor.extract(file_handler)
 
 
 def main() -> None:
@@ -86,15 +135,18 @@ def main() -> None:
         args.urls = valid_urls
         print(f"> Valid URLS ({len(args.urls)})")
 
-        _download(args, tiktok_downloader, valid_urls)
+        download(args, tiktok_downloader, valid_urls)
 
     if args.recursive:
-        file_handler = args.recursive
-        urls = VideoUrlExtractor.extract_urls(args.recursive)
-        if not urls:
-            raise argparse.ArgumentError(None, f"No valid urls found in '{file_handler.name}'")
+        try:
+            urls = extract_urls_from_file(args.recursive)
+        except ValueError as e:
+            parser.error(f"Error extracting URLs: {e}")
 
-        _download(args, tiktok_downloader, urls)
+        if not urls:
+            parser.error(f"No valid URLs found in '{args.recursive.name}'")
+
+        download(args, tiktok_downloader, urls)
 
 
 if __name__ == '__main__':

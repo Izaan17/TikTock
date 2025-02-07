@@ -100,7 +100,7 @@ def handle_json_file(parser, file_handler) -> list[str]:
         return [item for activity in selected_activities for item in
                 json_extractor.extract_from_tiktok_format(json_data, activity)]
 
-    return json_extractor.extract_from_custom_json_format(file_handler)
+    return json_extractor.extract_from_custom_json_format(json_data)
 
 
 def handle_txt_file(file_handler) -> list[str]:

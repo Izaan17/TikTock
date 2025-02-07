@@ -7,27 +7,29 @@ from downloader import TikTokDownloader
 class TikTokActivityType(Enum):
     """Types of TikTok activities that can be extracted."""
     FAVORITES = "Favorite Videos"
-    LIKES = "Liked List"
+    LIKES = "Like List"
 
     @classmethod
     def get_all_types(cls) -> list[str]:
+        """Returns a list of all activity type values."""
         return [activity_type.value for activity_type in cls]
 
     @classmethod
     def from_string(cls, value: str) -> 'TikTokActivityType':
-        for member in cls:
-            if member.value == value:
-                return member
-        raise ValueError(f"Invalid activity type: {value}")
+        """Converts a string to a TikTokActivityType enum."""
+        try:
+            return cls(value)
+        except ValueError:
+            raise ValueError(f"Invalid activity type: {value}")
 
 
 class JSONExtractor:
-    """Extracts video URLs from JSON files."""
+    """Handles extraction of TikTok video URLs from JSON files."""
 
     @staticmethod
     def is_tiktok_format(data: dict) -> bool:
         """
-        Check if the JSON parsed data is in the TikTok JSON format
+        Checks if the provided data follows TikTok's JSON format.
         :param data: The JSON data to check
         :return: True if the data has the keys that constitute the TikTok JSON format, False otherwise
         """
@@ -50,25 +52,38 @@ class JSONExtractor:
         :return: The valid TikTok URLs corresponding to the activity type
         """
         activity = data.get('Activity', {})
-        if activity_type == TikTokActivityType.FAVORITES:
-            return self._extract_videos(activity.get('Favorite Videos', {}), 'FavoriteVideoList')
-
-        return self._extract_videos(activity.get('Liked List', {}), 'ItemFavoriteList')
+        activity_section = self._get_activity_section(activity, activity_type)
+        return self._extract_videos(activity_section, activity_type)
 
     @staticmethod
-    def _extract_videos(activity_section: dict, key: str) -> list[str]:
+    def _get_activity_section(activity: dict, activity_type: TikTokActivityType) -> dict:
+        """
+        Fetches the relevant section of the activity based on the activity type.
+        :param activity: The activity section
+        :param activity_type: The type of activity
+        :return:
+        """
+        if activity_type == TikTokActivityType.FAVORITES:
+            return activity.get('Favorite Videos', {})
+        return activity.get('Like List', {})
+
+    @staticmethod
+    def _extract_videos(activity_section: dict, activity_type: TikTokActivityType) -> list[str]:
         """
         Extracts TikTok video URLs from the nested JSON data
         :param activity_section: Which section to get the data from
-        :param key: The key in which to get the video URLs
+        :param activity_type: The type of activity
         :return: The valid TikTok URLs corresponding to the activity section
         """
-        return [video.get('Link') for video in activity_section.get(key, []) if
-                TikTokDownloader.valid_url(video.get('Link'))]
+        key = 'FavoriteVideoList' if activity_type == TikTokActivityType.FAVORITES else 'ItemFavoriteList'
+        video_url_key = 'Link' if activity_type == TikTokActivityType.FAVORITES else 'link'
+
+        return [video.get(video_url_key) for video in activity_section.get(key, []) if
+                TikTokDownloader.valid_url(video.get(video_url_key))]
 
 
 class TextExtractor:
-    """Extracts video URLs from text files."""
+    """Extracts TikTok video URLs from text files."""
 
     @staticmethod
     def extract(file_handler: TextIO) -> list[str]:

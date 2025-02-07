@@ -46,9 +46,6 @@ class TikTokDownloader:
             # Clean up the URL (remove backslashes)
             video_url = video_urls[0].encode().decode('unicode-escape')
 
-            # Replace watermarked URL with watermark-free version if possible
-            video_url = video_url.replace('/watermark/', '/no-watermark/')
-
             return video_url
 
         except Exception as e:

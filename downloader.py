@@ -62,7 +62,7 @@ class TikTokDownloader:
         return bool(re.match(tiktok_pattern, url))
 
     def download(self, url: str, output_path: str, on_progress: Callable[[int, int], None] = None,
-                 block_size: int = 1024, delay: int = 1) -> dict[str, any]:
+                 chunk_size: int = 1024, delay: int = 1) -> dict[str, any]:
         """
         Downloads the video from the given TikTok URL and saves it to the specified output path.
         The function optionally reports download progress through the `on_progress` callback and allows configuring
@@ -73,7 +73,7 @@ class TikTokDownloader:
         :param on_progress: (Optional) A callback function that will be called with the number of bytes downloaded
                              and the total size of the file. The callback signature should be `on_progress(bytes_downloaded, total_size)`.
                              This parameter can be used to display or track download progress.
-        :param block_size: (Optional) The size of each chunk of data to download in bytes. Default is 1024 bytes (1 KB).
+        :param chunk_size: (Optional) The size of each chunk of data to download in bytes. Default is 1024 bytes (1 KB).
                             A larger block size may increase download speed but use more memory.
         :param delay: (Optional) The delay in seconds between the request. Default is 1 second.
                       This can be used to reduce server load.
@@ -101,7 +101,7 @@ class TikTokDownloader:
             bytes_downloaded = 0
 
             with open(output_path, 'wb') as f:
-                for chunk in response.iter_content(chunk_size=block_size):
+                for chunk in response.iter_content(chunk_size=chunk_size):
                     if chunk:
                         f.write(chunk)
                         bytes_downloaded += len(chunk)

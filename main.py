@@ -14,17 +14,20 @@ def create_parser() -> argparse.ArgumentParser:
     :return: The configured parser
     """
     parser = argparse.ArgumentParser(description="TikTok Video Downloader")
-
-    # Positional arguments for URLs
+    # Positional arguments
     parser.add_argument("urls", nargs="*", metavar="TIKTOK_URLS", help="List of TikTok video URLs")
 
-    # Optional argument for output folder (with default current datetime as file name)
+    # Optional arguments
     parser.add_argument("-o", "--output", type=dir_type, metavar="FOLDER_OUTPUT", default=f".",
                         help="Directory to save the downloaded videos")
 
-    # Optional argument for a recursive file (e.g., a file with a list of URLs)
-    parser.add_argument("-r", "--recursive", type=argparse.FileType('r'),  # Open the file in read mode
-                        metavar="RECURSIVE", help="File containing a list of TikTok URLs to download recursively")
+    parser.add_argument("-r", "--recursive", type=argparse.FileType('r'), metavar="RECURSIVE",
+                        help="File containing a list of TikTok URLs to download recursively")
+
+    parser.add_argument("-d", "--delay", type=int, metavar="DELAY", help="The delay before each download", default=1)
+
+    parser.add_argument("-c", "--chunk-size", type=int, metavar="CHUNK_SIZE", help="The write speed of each download",
+                        default=1024)
 
     return parser
 
@@ -50,10 +53,10 @@ def download(args: argparse.Namespace, tiktok_downloader: TikTokDownloader, urls
 
     try:
         for i, url in enumerate(urls, start=1):
-            print(f"==> Downloading [{i}/{len(urls)}] {url}")
+            print(f"==> Downloading {i} of {len(urls)} {url}")
             tiktok_id = f"{url.split('/')[-2]}"
             response = tiktok_downloader.download(url, output_path=os.path.join(args.output, f"{tiktok_id}.mp4"),
-                                                  on_progress=on_progress)
+                                                  on_progress=on_progress, delay=args.delay, chunk_size=args.chunk_size)
 
             # Print status, error (if any), path, and size after download
             success = 'Success' if response.get('success', None) else 'Failed'
@@ -65,14 +68,20 @@ def download(args: argparse.Namespace, tiktok_downloader: TikTokDownloader, urls
             print()
 
             if error != "":
-                failed.append(tiktok_id)
+                failed.append((url, response.get('error', '')))
             else:
                 completed.append(tiktok_id)
     except KeyboardInterrupt:
-        print("Exiting...")
+        pass
 
+    print(f"\nDownload Summary:")
+    print(f"Total URLs Attempted: {len(completed) + len(failed)}\n")
     if failed:
-        print(f"{len(failed)} videos failed to download.")
+        print("Details of Failed Downloads:")
+        for i, video_tuple in enumerate(failed, start=1):
+            url, error = video_tuple
+            print(f"{i}. {url} - {error}")
+        print(f"Total: {len(failed)} videos failed to download.\n")
 
     if completed:
         print(f"{len(completed)} videos have downloaded successfully.")
@@ -106,7 +115,9 @@ def handle_json_file(parser, file_handler) -> list[str]:
     json_data = json.load(file_handler)
 
     if json_extractor.is_tiktok_format(json_data):
-        selected_activities = select_from_choices("Select TikTok activities:", TikTokActivityType.get_all_types(),
+        print("TikTok User Download Data Detected")
+        print("Please select the following activities to download videos from")
+        selected_activities = select_from_choices("Select TikTok activities", TikTokActivityType.get_all_types(),
                                                   allow_multiple=True)
         selected_activities = [TikTokActivityType.from_string(activity) for activity in selected_activities]
         if not selected_activities:

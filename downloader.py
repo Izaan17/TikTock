@@ -29,9 +29,9 @@ class TikTokDownloader:
             response.raise_for_status()
 
             # Try multiple patterns to find video URLs
-            url_patterns = [r'"downloadAddr":"([^"]+)"',  # Download URL
-                            r'"playAddr":"([^"]+)"',  # Play URL
-                            r'"video":{"downloadAddr":"([^"]+)"'  # Alternate pattern
+            url_patterns = [r'"playAddr":"([^"]+)"',  # Play URL this url has no watermark
+                            r'"downloadAddr":"([^"]+)"',  # Download URL has a watermark
+                            r'"video":{"downloadAddr":"([^"]+)"'  # Alternate pattern not sure yet
                             ]
 
             video_urls = []

@@ -62,25 +62,27 @@ def download(args: argparse.Namespace, tiktok_downloader: TikTokDownloader, urls
         print()
 
 
-def extract_urls_from_file(file_handler) -> list[str]:
+def extract_urls_from_file(parser, file_handler) -> list[str]:
     """
     Wrapper class for extracting urls to each specified format
+    :param parser: The current argument parser
     :param file_handler: The file handler
     :return: A list of a valid TikTok URLs based on the file handlers file extension
     """
     file_ext = os.path.splitext(file_handler.name)[1].lower()
 
     if file_ext == '.json':
-        return handle_json_file(file_handler)
+        return handle_json_file(parser, file_handler)
     elif file_ext == '.txt':
         return handle_txt_file(file_handler)
     else:
         raise ValueError(f"Unsupported file type '{file_ext}'")
 
 
-def handle_json_file(file_handler) -> list[str]:
+def handle_json_file(parser, file_handler) -> list[str]:
     """
     The wrapper class for extracting TikTok video URLs from a json file
+    :param parser: The current argument parser
     :param file_handler: The file handler
     :return: A list of valid TikTok URLs
     """
@@ -91,6 +93,8 @@ def handle_json_file(file_handler) -> list[str]:
         selected_activities = select_from_choices("Select TikTok activities:", TikTokActivityType.get_all_types(),
                                                   allow_multiple=True)
         selected_activities = [TikTokActivityType.from_string(activity) for activity in selected_activities]
+        if not selected_activities:
+            parser.error("User did not specify any TikTok activity")
 
         # Flattening using list comprehension
         return [item for activity in selected_activities for item in
@@ -139,7 +143,7 @@ def main() -> None:
 
     if args.recursive:
         try:
-            urls = extract_urls_from_file(args.recursive)
+            urls = extract_urls_from_file(parser, args.recursive)
         except ValueError as e:
             parser.error(f"Error extracting URLs: {e}")
 

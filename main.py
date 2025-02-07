@@ -37,6 +37,8 @@ def download(args: argparse.Namespace, tiktok_downloader: TikTokDownloader, urls
     :param urls: The urls to download
     :return: None
     """
+    failed = []
+    completed = []
 
     def on_progress(downloaded, total):
         progress = (downloaded / total) * 100
@@ -46,20 +48,34 @@ def download(args: argparse.Namespace, tiktok_downloader: TikTokDownloader, urls
         if downloaded == total:
             print()
 
-    for i, url in enumerate(urls, start=1):
-        print(f"==> Downloading [{i}/{len(urls)}] {url}")
-        tiktok_id = f"{url.split('/')[-2]}"
-        response = tiktok_downloader.download(url, output_path=os.path.join(args.output, f"{tiktok_id}.mp4"),
-                                              on_progress=on_progress)
+    try:
+        for i, url in enumerate(urls, start=1):
+            print(f"==> Downloading [{i}/{len(urls)}] {url}")
+            tiktok_id = f"{url.split('/')[-2]}"
+            response = tiktok_downloader.download(url, output_path=os.path.join(args.output, f"{tiktok_id}.mp4"),
+                                                  on_progress=on_progress)
 
-        # Print status, error (if any), path, and size after download
-        success = 'Success' if response.get('success', None) else 'Failed'
-        error = f"Error: {response.get('error', '')} | " if response.get('error') else ''
-        path = response.get('path', 'No path given')
-        size = response.get('size')
+            # Print status, error (if any), path, and size after download
+            success = 'Success' if response.get('success', None) else 'Failed'
+            error = f"Error: {response.get('error', '')} | " if response.get('error') else ''
+            path = response.get('path', 'No path given')
+            size = response.get('size')
 
-        print(f"Status: {success} | {error}Output: {path} | Size: {size} |")
-        print()
+            print(f"Status: {success} | {error}Output: {path} | Size: {size} |")
+            print()
+
+            if error != "":
+                failed.append(tiktok_id)
+            else:
+                completed.append(tiktok_id)
+    except KeyboardInterrupt:
+        print("Exiting...")
+
+    if failed:
+        print(f"{len(failed)} videos failed to download.")
+
+    if completed:
+        print(f"{len(completed)} videos have downloaded successfully.")
 
 
 def extract_urls_from_file(parser, file_handler) -> list[str]:

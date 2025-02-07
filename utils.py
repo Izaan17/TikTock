@@ -16,6 +16,7 @@ def select_from_choices(prompt: str, choices: list, allow_multiple: bool = True)
         # Get valid user inputx
         try:
             user_choice = get_int(f"{prompt} (or press 0 to finish): ", 0, len(choices))
+            print()
 
             if user_choice == 0:
                 if allow_multiple:  # If multiple selections allowed, break out only when user opts to finish
@@ -31,7 +32,6 @@ def select_from_choices(prompt: str, choices: list, allow_multiple: bool = True)
                 selected.append(selected_choice_element)  # Add the item if not selected
 
         except KeyboardInterrupt:
-            print("\nExiting...")
             break
 
     return selected

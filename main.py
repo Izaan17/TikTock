@@ -45,7 +45,7 @@ def main() -> None:
         if not urls:
             parser.error(f"No valid URLs found in '{args.recursive.name}'")
 
-        download_manager.download(urls, args.output, args.delay, args.chunk_size)
+        download_manager.download(urls, args.output, args.delay, args.chunk_size, args.log)
 
 
 if __name__ == '__main__':

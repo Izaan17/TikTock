@@ -28,4 +28,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("--activity", nargs="+", choices=TikTokActivityType.get_all_types(), metavar="TIKTOK_ACTIVITY",
                         help="Pre select an activity", default=[])
 
+    parser.add_argument("--log", type=argparse.FileType('w'), metavar="FILE_NAME",
+                        help="Save a JSON log of the completed and failed URLs", const="tiktock_log.json", nargs="?")
+
     return parser

@@ -1,4 +1,6 @@
+import json
 import os.path
+from typing import TextIO
 
 from display import DisplayManager
 from tiktok_downloader import TikTokDownloader
@@ -11,9 +13,11 @@ class DownloadManager:
         self.display_manager = display_manager
         self.tiktok_downloader = tiktok_downloader
 
-    def download(self, urls: list[str], output_path: str, delay: int, chunk_size: int):
-        completed = []
-        failed = []
+    def download(self, urls: list[str], output_path: str, delay: int, chunk_size: int,
+                 log_handler: TextIO | None = None):
+        data = {"completed": [], "failed": []}
+        completed = data["completed"]
+        failed = data["failed"]
         try:
             for i, url in enumerate(urls, start=1):
                 response = self._download_video(url, output_path, delay, chunk_size, i, len(urls))
@@ -26,6 +30,9 @@ class DownloadManager:
             self.display_manager.console.print("\n[bold yellow]Download interrupted[/]")
 
         self.display_manager.show_summary(completed, failed)
+
+        if log_handler:
+            json.dump(data, log_handler)
 
     def _download_video(self, url: str, output_path: str, delay: int, chunk_size: int, index: int, total: int):
         video_id = url.split('/')[-2]

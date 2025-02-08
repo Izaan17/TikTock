@@ -39,7 +39,7 @@ command-line arguments and file-based input, with progress tracking and detailed
 Download videos from one or more TikTok URLs:
 
 ```bash
-python -m main.py https://www.tiktok.com/@username/video/1234567890
+python main.py https://www.tiktok.com/@username/video/1234567890
 ```
 
 ### Download to a Specific Directory
@@ -47,7 +47,7 @@ python -m main.py https://www.tiktok.com/@username/video/1234567890
 Specify an output directory (it must exist):
 
 ```bash
-python -m main.py https://www.tiktok.com/@username/video/1234567890 -o ./videos
+python main.py https://www.tiktok.com/@username/video/1234567890 -o ./videos
 ```
 
 ### Process URLs from a File
@@ -55,18 +55,18 @@ python -m main.py https://www.tiktok.com/@username/video/1234567890 -o ./videos
 Download videos from a file containing TikTok URLs:
 
 ```bash
-python -m main.py -r urls.txt
+python main.py -r urls.txt
 ```
 
 ### Advanced Options
 
 - **Delay between downloads**: Set a delay (in seconds) between downloads:
   ```bash
-  python -m main.py https://www.tiktok.com/@username/video/1234567890 -d 2
+  python main.py https://www.tiktok.com/@username/video/1234567890 -d 2
   ```
 - **Chunk size**: Adjust the download chunk size (in bytes):
   ```bash
-  python -m main.py https://www.tiktok.com/@username/video/1234567890 -c 2048
+  python main.py https://www.tiktok.com/@username/video/1234567890 -c 2048
   ```
 
 ---

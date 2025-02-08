@@ -71,6 +71,22 @@ python main.py -r urls.txt
 
 ---
 
+### **Log File**:
+
+Save a JSON log of both failed and successfully processed URLs.
+
+**Arguments**:
+
+- `FILE_NAME`: The name of the log file (defaults to `tiktock_log.json`).
+
+**Example Usage**:
+
+```bash
+python main.py https://www.tiktok.com/@username/video/1234567890 --log FILE_NAME
+```
+
+---
+
 ## Supported File Formats
 
 ### Text Files (`.txt`)

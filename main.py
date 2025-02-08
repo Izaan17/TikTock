@@ -40,91 +40,102 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def get_tiktok_id(url: str) -> str:
+    """Extracts TikTok ID from URL."""
+    return url.split("/")[-2]
+
+
+def generate_response_table(response: dict) -> Table:
+    """Generates a table displaying the download results for a single video."""
+    success = '✓' if response.get('success') else '𐄂'
+    status_color = "green" if success == '✓' else "red"
+    error = response.get('error', '')
+    path = response.get('path', 'None')
+    size = str(response.get('size', 'None'))
+    url = response.get('url', 'None')
+
+    table = Table(show_header=False, box=None)
+    table.add_column(style="bold")
+
+    table.add_row("Status:", f"[bold {status_color}]{success}[/]")
+    table.add_row("URL:", url)
+    table.add_row("Output:", path)
+    table.add_row("Size:", size)
+    if error:
+        table.add_row("[red]Error[/]:", error)
+
+    return table
+
+
+def generate_summary_table(completed: list[str], failed: list[tuple[str, str]]) -> Table:
+    """Generates the final summary table showing overall download results."""
+    table = Table(title="Download Summary", show_header=True, header_style="bold")
+    table.add_column("Total URLs Attempted", justify="right")
+    table.add_column("Successfully Downloaded", justify="right")
+    table.add_column("Failed Downloads", justify="right")
+    table.add_row(f"{len(completed) + len(failed)}", f"[green]{len(completed)}", f"[red]{len(failed)}", )
+    return table
+
+
+def generate_failed_table(failed: list[tuple[str, str]]) -> Table:
+    """Generates a table showing details of failed downloads."""
+    failed_table = Table(show_header=True, header_style="bold")
+    failed_table.add_column("No.", style="bold cyan", justify="right")
+    failed_table.add_column("URL", style="bold")
+    failed_table.add_column("Error", style="bold red")
+
+    for i, (url, error) in enumerate(failed, start=1):
+        failed_table.add_row(str(i), f"[bold]{url}[/]", f"[red]{error}[/]")
+
+    return failed_table
+
+
+def download_single_video(url: str, output_file: str, downloader: TikTokDownloader, delay: int, chunk_size: int,
+                          index: int, total: int, console: Console) -> dict:
+    """Handles the download of a single video with progress tracking."""
+    with Progress(TextColumn("[bold]Downloading {task.fields[filename]}", justify="right"), BarColumn(bar_width=None),
+                  "[white]{task.percentage:>3.1f}%", TimeRemainingColumn(), console=console) as progress:
+        task = progress.add_task("download", filename=f"{index} of {total}")
+
+        def on_progress(downloaded: int, total_bytes: int):
+            progress.update(task, completed=(downloaded / total_bytes) * 100)
+
+        return downloader.download(url, output_path=output_file, on_progress=on_progress, delay=delay,
+                                   chunk_size=chunk_size)
+
+
 def download(args: argparse.Namespace, tiktok_downloader: TikTokDownloader, urls: list[str]) -> None:
-    """
-    Wrapper function for downloading TikTok videos with enhanced output using rich.
-    :param args: The argparse namespace
-    :param tiktok_downloader: The TikTok downloader instance
-    :param urls: The urls to download
-    :return: None
-    """
+    """Main download handler coordinating the download process and reporting."""
+    console = Console()
     failed = []
     completed = []
-    console = Console()
 
     try:
         for i, url in enumerate(urls, start=1):
-            tiktok_id = f"{url.split('/')[-2]}"
+            tiktok_id = get_tiktok_id(url)
             output_file = os.path.join(args.output, f"{tiktok_id}.mp4")
 
-            # Initialize the progress bar for this download
-            with Progress(TextColumn("[bold]Downloading {task.fields[filename]}", justify="right"),
-                          BarColumn(bar_width=None), "[white]{task.percentage:>3.1f}%", TimeRemainingColumn(),
-                          console=console) as progress:
-                task = progress.add_task("download", filename=f"{i} of {len(urls)}")
+            response = download_single_video(url=url, output_file=output_file, downloader=tiktok_downloader,
+                                             delay=args.delay, chunk_size=args.chunk_size, index=i, total=len(urls),
+                                             console=console)
 
-                def on_progress(downloaded, total):
-                    # Update the progress bar based on the percentage completed
-                    progress.update(task, completed=(downloaded / total) * 100)
+            console.print(generate_response_table(response))
 
-                # Perform the download
-                response = tiktok_downloader.download(url, output_path=output_file, on_progress=on_progress,
-                                                      delay=args.delay, chunk_size=args.chunk_size)
-
-            # Print status, error (if any), path, and size after the progress bar
-            success = '✓' if response.get('success', None) else '𐄂'
-            status_color = "green" if success == '✓' else "red"
-            error = response.get('error', '')
-            path = response.get('path', 'None')
-            size = str(response.get('size', 'None'))
-
-            response_table = Table(show_header=False, box=None)
-            response_table.add_column(style="bold")
-
-            response_table.add_row("Status:", f"[bold {status_color}]{success}[/]")
-            response_table.add_row("URL:", url)
-            response_table.add_row("Output:", path)
-            response_table.add_row("Size:", size)
-            if error != '':
-                response_table.add_row("[red]Error[/]:", error)
-
-            console.print(response_table)
-
-            if error != "":
-                failed.append((url, response.get('error', '')))
+            if response.get('error'):
+                failed.append((url, response['error']))
             else:
                 completed.append(tiktok_id)
 
     except KeyboardInterrupt:
         console.print("\n[bold yellow]Download interrupted by user.[/]")
 
-    # Summary table
-    table = Table(title="Download Summary", show_header=True, header_style="bold")
-    table.add_column("Total URLs Attempted", justify="right")
-    table.add_column("Successfully Downloaded", justify="right")
-    table.add_column("Failed Downloads", justify="right")
-    table.add_row(f"{len(completed) + len(failed)}", f"[green]{len(completed)}", f"[red]{len(failed)}")
+    # Show summary of results
+    console.print(generate_summary_table(completed, failed))
 
-    console.print(table)
-
+    # Show failed downloads details if any
     if failed:
         console.print("\n[bold]Details of Failed Downloads:[/]")
-
-        # Create a table to display failed downloads
-        failed_table = Table(show_header=True, header_style="bold")
-        failed_table.add_column("No.", style="bold cyan", justify="right")
-        failed_table.add_column("URL", style="bold")  # Adjust width as needed
-        failed_table.add_column("Error", style="bold red")
-
-        # Add rows for each failed video
-        for i, video_tuple in enumerate(failed, start=1):
-            url, error = video_tuple
-            failed_table.add_row(str(i), f"[bold]{url}[/]", f"[red]{error}[/]")
-
-        # Print the table with all failed download details
-        console.print(failed_table)
-
-        # Print total number of failed downloads
+        console.print(generate_failed_table(failed))
         console.print(f"[bold]Total[/]: {len(failed)} videos failed to download.\n")
 
 

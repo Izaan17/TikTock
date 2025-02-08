@@ -1,26 +1,10 @@
-from enum import Enum
+import json
+import os
 from typing import TextIO
 
-from downloader import TikTokDownloader
-
-
-class TikTokActivityType(Enum):
-    """Types of TikTok activities that can be extracted."""
-    FAVORITES = "Favorite Videos"
-    LIKES = "Like List"
-
-    @classmethod
-    def get_all_types(cls) -> list[str]:
-        """Returns a list of all activity type values."""
-        return [activity_type.value for activity_type in cls]
-
-    @classmethod
-    def from_string(cls, value: str) -> 'TikTokActivityType':
-        """Converts a string to a TikTokActivityType enum."""
-        try:
-            return cls(value)
-        except ValueError:
-            raise ValueError(f"Invalid activity type: {value}")
+from models import TikTokActivityType
+from tiktok_downloader import TikTokDownloader
+from utils import select_from_choices
 
 
 class JSONExtractor:
@@ -93,3 +77,72 @@ class TextExtractor:
         :return: The valid TikTok URLs in the text file
         """
         return [url.strip() for url in file_handler.readlines() if TikTokDownloader.valid_url(url.strip())]
+
+
+class URLExtractor:
+    """Extracts URLS from various file types"""
+
+    @staticmethod
+    def handle_txt_file(file_handler) -> list[str]:
+        """
+        The wrapper class for extracting TikTok video URLs from a text file
+        :param file_handler: The file handler
+        :return: A list of valid TikTok URLs
+        """
+        extractor = TextExtractor()
+        return extractor.extract(file_handler)
+
+    @classmethod
+    def extract_urls_from_file(cls, parser, file_handler, args) -> list[str]:
+        """
+        Wrapper class for extracting urls to each specified format
+        :param parser: The current argument parser
+        :param file_handler: The file handler
+        :param args: Parser arguments
+        :return: A list of a valid TikTok URLs based on the file handlers file extension
+        """
+        file_ext = os.path.splitext(file_handler.name)[1].lower()
+
+        if file_ext == '.json':
+            return cls.handle_json_file(parser, file_handler, args)
+        elif file_ext == '.txt':
+            return cls.handle_txt_file(file_handler)
+        else:
+            raise ValueError(f"Unsupported file type '{file_ext}'")
+
+    @classmethod
+    def handle_json_file(cls, parser, file_handler, args) -> list[str]:
+        """
+        Extracts TikTok video URLs from a JSON file.
+
+        :param parser: Argument parser instance
+        :param file_handler: File handler object
+        :param args: Parser arguments
+        :return: A list of valid TikTok URLs
+        """
+        json_extractor = JSONExtractor()
+        json_data = json.load(file_handler)
+
+        if not json_extractor.is_tiktok_format(json_data):
+            return json_extractor.extract_from_custom_json_format(json_data)
+
+        selected_activities = args.activity or cls.prompt_for_activities()
+
+        if not selected_activities:
+            parser.error("User did not specify any TikTok activity")
+
+        # Flatten the list to convert them into TikTok Activity Types
+        selected_activities = [TikTokActivityType.from_string(activity) for activity in selected_activities]
+
+        return [item for activity in selected_activities for item in
+                json_extractor.extract_from_tiktok_format(json_data, activity)]
+
+    @staticmethod
+    def prompt_for_activities() -> list[str]:
+        """
+        Prompts the user to select TikTok activities.
+        :return: List of activities
+        """
+        print("TikTok User Download Data Detected")
+        print("Please select the following activities to download videos from")
+        return select_from_choices("Select TikTok activities", TikTokActivityType.get_all_types(), allow_multiple=True)

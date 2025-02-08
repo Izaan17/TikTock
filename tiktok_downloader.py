@@ -28,6 +28,9 @@ class TikTokDownloader:
             response = self.session.get(url, headers=self.headers)
             response.raise_for_status()
 
+            if 'Video currently unavailable' in response.text:
+                raise Exception("Video currently unavailable")
+
             # Try multiple patterns to find video URLs
             url_patterns = [r'"playAddr":"([^"]+)"',  # Play URL this url has no watermark
                             r'"downloadAddr":"([^"]+)"',  # Download URL has a watermark
@@ -49,7 +52,7 @@ class TikTokDownloader:
             return video_url
 
         except Exception as e:
-            raise Exception(f"Failed to get download URL: {str(e)}")
+            raise Exception(e)
 
     @staticmethod
     def valid_url(url: str) -> bool:

@@ -1,6 +1,11 @@
 import argparse
 import json
+import os
 import os.path
+
+from rich.console import Console
+from rich.progress import Progress, BarColumn, TextColumn, TimeRemainingColumn
+from rich.table import Table
 
 from arg_types import dir_type
 from downloader import TikTokDownloader
@@ -29,12 +34,15 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("-c", "--chunk-size", type=int, metavar="CHUNK_SIZE", help="The write speed of each download",
                         default=1024)
 
+    parser.add_argument("--activity", nargs="+", choices=TikTokActivityType.get_all_types(), metavar="TIKTOK_ACTIVITY",
+                        help="Pre select an activity", default=[])
+
     return parser
 
 
 def download(args: argparse.Namespace, tiktok_downloader: TikTokDownloader, urls: list[str]) -> None:
     """
-    Wrapper function for downloading TikTok videos.
+    Wrapper function for downloading TikTok videos with enhanced output using rich.
     :param args: The argparse namespace
     :param tiktok_downloader: The TikTok downloader instance
     :param urls: The urls to download
@@ -42,92 +50,137 @@ def download(args: argparse.Namespace, tiktok_downloader: TikTokDownloader, urls
     """
     failed = []
     completed = []
-
-    def on_progress(downloaded, total):
-        progress = (downloaded / total) * 100
-        status = '~' if downloaded != total else '✓'
-        print(f"{status} {progress:.2f}%", end="\r")
-
-        if downloaded == total:
-            print()
+    console = Console()
 
     try:
         for i, url in enumerate(urls, start=1):
-            print(f"==> Downloading {i} of {len(urls)} {url}")
             tiktok_id = f"{url.split('/')[-2]}"
-            response = tiktok_downloader.download(url, output_path=os.path.join(args.output, f"{tiktok_id}.mp4"),
-                                                  on_progress=on_progress, delay=args.delay, chunk_size=args.chunk_size)
+            output_file = os.path.join(args.output, f"{tiktok_id}.mp4")
 
-            # Print status, error (if any), path, and size after download
-            success = 'Success' if response.get('success', None) else 'Failed'
-            error = f"Error: {response.get('error', '')} | " if response.get('error') else ''
-            path = response.get('path', 'No path given')
-            size = response.get('size')
+            # Initialize the progress bar for this download
+            with Progress(TextColumn("[bold]Downloading {task.fields[filename]}", justify="right"),
+                          BarColumn(bar_width=None), "[white]{task.percentage:>3.1f}%", TimeRemainingColumn(),
+                          console=console) as progress:
+                task = progress.add_task("download", filename=f"{i} of {len(urls)}")
 
-            print(f"Status: {success} | {error}Output: {path} | Size: {size} |")
-            print()
+                def on_progress(downloaded, total):
+                    # Update the progress bar based on the percentage completed
+                    progress.update(task, completed=(downloaded / total) * 100)
+
+                # Perform the download
+                response = tiktok_downloader.download(url, output_path=output_file, on_progress=on_progress,
+                                                      delay=args.delay, chunk_size=args.chunk_size)
+
+            # Print status, error (if any), path, and size after the progress bar
+            success = '✓' if response.get('success', None) else '𐄂'
+            status_color = "green" if success == '✓' else "red"
+            error = response.get('error', '')
+            path = response.get('path', 'None')
+            size = str(response.get('size', 'None'))
+
+            response_table = Table(show_header=False, box=None)
+            response_table.add_column(style="bold")
+
+            response_table.add_row("Status:", f"[bold {status_color}]{success}[/]")
+            response_table.add_row("URL:", url)
+            response_table.add_row("Output:", path)
+            response_table.add_row("Size:", size)
+            if error != '':
+                response_table.add_row("[red]Error[/]:", error)
+
+            console.print(response_table)
 
             if error != "":
                 failed.append((url, response.get('error', '')))
             else:
                 completed.append(tiktok_id)
-    except KeyboardInterrupt:
-        pass
 
-    print(f"\nDownload Summary:")
-    print(f"Total URLs Attempted: {len(completed) + len(failed)}\n")
+    except KeyboardInterrupt:
+        console.print("\n[bold yellow]Download interrupted by user.[/]")
+
+    # Summary table
+    table = Table(title="Download Summary", show_header=True, header_style="bold")
+    table.add_column("Total URLs Attempted", justify="right")
+    table.add_column("Successfully Downloaded", justify="right")
+    table.add_column("Failed Downloads", justify="right")
+    table.add_row(f"{len(completed) + len(failed)}", f"[green]{len(completed)}", f"[red]{len(failed)}")
+
+    console.print(table)
+
     if failed:
-        print("Details of Failed Downloads:")
+        console.print("\n[bold]Details of Failed Downloads:[/]")
+
+        # Create a table to display failed downloads
+        failed_table = Table(show_header=True, header_style="bold")
+        failed_table.add_column("No.", style="bold cyan", justify="right")
+        failed_table.add_column("URL", style="bold")  # Adjust width as needed
+        failed_table.add_column("Error", style="bold red")
+
+        # Add rows for each failed video
         for i, video_tuple in enumerate(failed, start=1):
             url, error = video_tuple
-            print(f"{i}. {url} - {error}")
-        print(f"Total: {len(failed)} videos failed to download.\n")
+            failed_table.add_row(str(i), f"[bold]{url}[/]", f"[red]{error}[/]")
 
-    if completed:
-        print(f"{len(completed)} videos have downloaded successfully.")
+        # Print the table with all failed download details
+        console.print(failed_table)
+
+        # Print total number of failed downloads
+        console.print(f"[bold]Total[/]: {len(failed)} videos failed to download.\n")
 
 
-def extract_urls_from_file(parser, file_handler) -> list[str]:
+def extract_urls_from_file(parser, file_handler, args) -> list[str]:
     """
     Wrapper class for extracting urls to each specified format
     :param parser: The current argument parser
     :param file_handler: The file handler
+    :param args: Parser arguments
     :return: A list of a valid TikTok URLs based on the file handlers file extension
     """
     file_ext = os.path.splitext(file_handler.name)[1].lower()
 
     if file_ext == '.json':
-        return handle_json_file(parser, file_handler)
+        return handle_json_file(parser, file_handler, args)
     elif file_ext == '.txt':
         return handle_txt_file(file_handler)
     else:
         raise ValueError(f"Unsupported file type '{file_ext}'")
 
 
-def handle_json_file(parser, file_handler) -> list[str]:
+def handle_json_file(parser, file_handler, args) -> list[str]:
     """
-    The wrapper class for extracting TikTok video URLs from a json file
-    :param parser: The current argument parser
-    :param file_handler: The file handler
+    Extracts TikTok video URLs from a JSON file.
+
+    :param parser: Argument parser instance
+    :param file_handler: File handler object
+    :param args: Parser arguments
     :return: A list of valid TikTok URLs
     """
     json_extractor = JSONExtractor()
     json_data = json.load(file_handler)
 
-    if json_extractor.is_tiktok_format(json_data):
-        print("TikTok User Download Data Detected")
-        print("Please select the following activities to download videos from")
-        selected_activities = select_from_choices("Select TikTok activities", TikTokActivityType.get_all_types(),
-                                                  allow_multiple=True)
-        selected_activities = [TikTokActivityType.from_string(activity) for activity in selected_activities]
-        if not selected_activities:
-            parser.error("User did not specify any TikTok activity")
+    if not json_extractor.is_tiktok_format(json_data):
+        return json_extractor.extract_from_custom_json_format(json_data)
 
-        # Flattening using list comprehension
-        return [item for activity in selected_activities for item in
-                json_extractor.extract_from_tiktok_format(json_data, activity)]
+    selected_activities = args.activity or prompt_for_activities()
 
-    return json_extractor.extract_from_custom_json_format(json_data)
+    if not selected_activities:
+        parser.error("User did not specify any TikTok activity")
+
+    # Flatten the list to convert them into TikTok Activity Types
+    selected_activities = [TikTokActivityType.from_string(activity) for activity in selected_activities]
+
+    return [item for activity in selected_activities for item in
+            json_extractor.extract_from_tiktok_format(json_data, activity)]
+
+
+def prompt_for_activities() -> list[str]:
+    """
+    Prompts the user to select TikTok activities.
+    :return: List of activities
+    """
+    print("TikTok User Download Data Detected")
+    print("Please select the following activities to download videos from")
+    return select_from_choices("Select TikTok activities", TikTokActivityType.get_all_types(), allow_multiple=True)
 
 
 def handle_txt_file(file_handler) -> list[str]:
@@ -170,7 +223,7 @@ def main() -> None:
 
     if args.recursive:
         try:
-            urls = extract_urls_from_file(parser, args.recursive)
+            urls = extract_urls_from_file(parser, args.recursive, args)
         except ValueError as e:
             parser.error(f"Error extracting URLs: {e}")
 

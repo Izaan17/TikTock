@@ -41,7 +41,7 @@ class TikTokDownloader:
                     break
 
             if not video_urls:
-                raise Exception("Could not find video URL in page source")
+                raise Exception("No video URL found (this may be photos or no longer available)")
 
             # Clean up the URL (remove backslashes)
             video_url = video_urls[0].encode().decode('unicode-escape')

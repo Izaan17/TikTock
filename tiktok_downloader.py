@@ -24,6 +24,10 @@ class TikTokDownloader:
         :raises Exception: If there is an error fetching or processing the URL.
         """
         try:
+            # Check if the url contains the photo keyword
+            if '/photo/' in url:
+                raise Exception("This URL contains an image, not a video")
+
             # First get the HTML page
             response = self.session.get(url, headers=self.headers)
             response.raise_for_status()

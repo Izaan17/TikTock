@@ -14,7 +14,16 @@ class DownloadManager:
         self.tiktok_downloader = tiktok_downloader
 
     def download(self, urls: list[str], output_path: str, delay: int, chunk_size: int,
-                 log_handler: TextIO | None = None):
+                 log_handler: TextIO | None = None) -> None:
+        """
+        Downloads many videos with the progress bar with status information and a summary
+        :param urls: The URLs to download
+        :param output_path: The output folder
+        :param delay: The delay between each download
+        :param chunk_size: The chunk size write speed
+        :param log_handler: If provided writes a log file of the completed and failed downloads
+        :return: None
+        """
         data = {"completed": [], "failed": []}
         completed = data["completed"]
         failed = data["failed"]

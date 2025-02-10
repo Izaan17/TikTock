@@ -34,8 +34,20 @@ class DownloadManager:
         if log_handler:
             json.dump(data, log_handler)
 
-    def _download_video(self, url: str, output_path: str, delay: int, chunk_size: int, index: int, total: int):
-        video_id = url.split('/')[-2]
+    def _download_video(self, url: str, output_path: str, delay: int, chunk_size: int, index: int, total: int) -> dict:
+        """
+        Downloads a video with the display managers progress bar
+        :param url: The url to download
+        :param output_path: The folder in which the file will be stored
+        :param delay: The delay before starting the download
+        :param chunk_size: The write speed of the transfer
+        :param index: The current index of the download
+        :param total: The total amount of downloads
+        :return: Response dictionary
+        """
+        # Ensure the url does not end with '/'
+        url = url.rstrip('/')
+        video_id = url.split('/')[-1]
         output_file = os.path.join(output_path, f"{video_id}.mp4")
 
         with self.display_manager.show_progress() as progress:

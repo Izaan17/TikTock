@@ -13,7 +13,7 @@ class TikTokDownloader:
             'Accept-Language': 'en-US,en;q=0.5', 'Connection': 'keep-alive'}
         self.session = requests.Session()
 
-    def _get_download_url(self, url: str) -> str:
+    def _get_video_url(self, url: str) -> str:
         """
         Retrieves the direct download URL of a video from the given web page URL.
         It makes an HTTP request, searches for video URLs in the page source, cleans up
@@ -91,7 +91,7 @@ class TikTokDownloader:
         """
         try:
             # Get video download URL
-            video_url = self._get_download_url(url)
+            video_url = self._get_video_url(url)
 
             # Add delay to avoid rate limiting
             time.sleep(delay)

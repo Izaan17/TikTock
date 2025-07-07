@@ -104,9 +104,9 @@ TikTok JSON data files (e.g., from TikTok's data export feature):
 
 ### Instructions for Downloading Your TikTok Data
 
-To download your TikTok data to get all saved favorites and liked videos please check out
+To download your TikTok data to get all saved favorites and liked videos, please check out
 this [link](https://support.tiktok.com/en/account-and-privacy/personalized-ads-and-data/requesting-your-data). Please
-make sure to download the json version the txt version is not supported yet.
+make sure to download the JSON version the txt version is not supported yet.
 
 #### Liked Videos List
 

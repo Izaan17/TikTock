@@ -21,7 +21,7 @@ class DisplayManager:
         self.console.print(table)
 
     def show_summary(self, completed: list, failed: list) -> None:
-        """Display final download summary."""
+        """Display the final download summary."""
         self.console.print(self._create_summary_table(completed, failed))
         if failed:
             self.console.print("\n[bold]Details of Failed Downloads:[/]")
@@ -30,7 +30,7 @@ class DisplayManager:
 
     @staticmethod
     def _create_response_table(response: dict) -> Table:
-        """Generate table for single download result."""
+        """Generate table for a single download result."""
         success = '✓' if response.get('success') else '𐄂'
         status_color = "green" if success == '✓' else "red"
 

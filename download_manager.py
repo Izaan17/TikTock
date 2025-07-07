@@ -1,6 +1,6 @@
 import json
 import os.path
-from typing import TextIO
+from _typeshed import SupportsWrite
 
 from display import DisplayManager
 from tiktok_downloader import TikTokDownloader
@@ -14,7 +14,7 @@ class DownloadManager:
         self.tiktok_downloader = tiktok_downloader
 
     def download(self, urls: list[str], output_path: str, delay: int, chunk_size: int,
-                 log_handler: TextIO | None = None) -> None:
+                 log_handler: SupportsWrite[str] | None = None) -> None:
         """
         Downloads many videos with the progress bar with status information and a summary
         :param urls: The URLs to download
@@ -49,7 +49,7 @@ class DownloadManager:
         :param url: The url to download
         :param output_path: The folder in which the file will be stored
         :param delay: The delay before starting the download
-        :param chunk_size: The write speed of the transfer
+        :param chunk_size: The writing speed of the transfer
         :param index: The current index of the download
         :param total: The total amount of downloads
         :return: Response dictionary

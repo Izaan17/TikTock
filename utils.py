@@ -8,7 +8,7 @@ def select_from_choices(prompt: str, choices: list, allow_multiple: bool = True)
 
     while True:
         if not allow_multiple and len(selected) >= 1:
-            break  # Stop if only single selection is allowed and already selected one item
+            break  # Stop if only a single selection is allowed and already selected one item
 
         print(f"Selected items: {', '.join(selected)}" if selected else '', end='\n' if selected else '')
         display_choices()
@@ -19,7 +19,7 @@ def select_from_choices(prompt: str, choices: list, allow_multiple: bool = True)
             print()
 
             if user_choice == 0:
-                if allow_multiple:  # If multiple selections allowed, break out only when user opts to finish
+                if allow_multiple:  # If multiple selections allowed, break out only when a user opts to finish
                     break
                 else:
                     return selected  # If not allowing multiple, finalize after 1 selection

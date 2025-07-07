@@ -22,7 +22,7 @@ class JSONExtractor:
     @staticmethod
     def extract_from_custom_json_format(data: dict) -> list[str]:
         """
-        Extracts TikTok video URLs from the custom json format of {'urls': ['https://tiktok.com/url1',]}
+        Extracts TikTok video URLs from the custom JSON format of {'urls': ['https://tiktok.com/url1']}
         :param data: The parsed JSON data
         :return: The valid TikTok URLs in the data
         """

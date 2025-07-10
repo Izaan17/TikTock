@@ -1,4 +1,5 @@
 import argparse
+from datetime import datetime
 
 from arg_types import dir_type
 from models import TikTokActivityType
@@ -29,6 +30,7 @@ def create_parser() -> argparse.ArgumentParser:
                         help="Pre select an activity", default=[])
 
     parser.add_argument("--log", type=argparse.FileType('w'), metavar="FILE_NAME",
-                        help="Save a JSON log of the completed and failed URLs", const="tiktock_log.json", nargs="?")
+                        help="Save a JSON log of the completed and failed URLs",
+                        const=f"{datetime.now().strftime("[tiktock] %Y-%m-%d_%H-%M_log.json")}", nargs="?")
 
     return parser

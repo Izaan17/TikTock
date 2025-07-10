@@ -77,7 +77,7 @@ Save a JSON log of both failed and successfully processed URLs.
 
 **Arguments**:
 
-- `FILE_NAME`: The name of the log file (defaults to `tiktock_log.json`).
+- `FILE_NAME`: The name of the log file (defaults to `[tiktock] %Y-%m-%d_%H-%M_log.json`).
 
 **Example Usage**:
 
@@ -97,10 +97,6 @@ Plain text files with one TikTok URL per line:
 https://www.tiktok.com/@username/video/1234567890
 https://www.tiktok.com/@username/video/0987654321
 ```
-
-### JSON Files (`.json`)
-
-TikTok JSON data files (e.g., from TikTok's data export feature):
 
 ### Instructions for Downloading Your TikTok Data
 

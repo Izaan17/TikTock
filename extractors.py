@@ -93,24 +93,6 @@ class URLExtractor:
         return extractor.extract(file_handler)
 
     @classmethod
-    def extract_urls_from_file(cls, parser, file_handler, args) -> list[str]:
-        """
-        Wrapper class for extracting urls to each specified format
-        :param parser: The current argument parser
-        :param file_handler: The file handler
-        :param args: Parser arguments
-        :return: A list of a valid TikTok URLs based on the file handlers file extension
-        """
-        file_ext = os.path.splitext(file_handler.name)[1].lower()
-
-        if file_ext == '.json':
-            return cls.handle_json_file(parser, file_handler, args)
-        elif file_ext == '.txt':
-            return cls.handle_txt_file(file_handler)
-        else:
-            raise ValueError(f"Unsupported file type '{file_ext}'")
-
-    @classmethod
     def handle_json_file(cls, parser, file_handler, args) -> list[str]:
         """
         Extracts TikTok video URLs from a JSON file.
@@ -136,6 +118,24 @@ class URLExtractor:
 
         return [item for activity in selected_activities for item in
                 json_extractor.extract_from_tiktok_format(json_data, activity)]
+
+    @classmethod
+    def extract_urls_from_file(cls, parser, file_handler, args) -> list[str]:
+        """
+        Wrapper class for extracting urls to each specified format
+        :param parser: The current argument parser
+        :param file_handler: The file handler
+        :param args: Parser arguments
+        :return: A list of a valid TikTok URLs based on the file handlers file extension
+        """
+        file_ext = os.path.splitext(file_handler.name)[1].lower()
+
+        if file_ext == '.json':
+            return cls.handle_json_file(parser, file_handler, args)
+        elif file_ext == '.txt':
+            return cls.handle_txt_file(file_handler)
+        else:
+            raise ValueError(f"Unsupported file type '{file_ext}'")
 
     @staticmethod
     def prompt_for_activities() -> list[str]:

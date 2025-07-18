@@ -16,12 +16,12 @@ def create_parser() -> argparse.ArgumentParser:
 
     # Optional arguments
     parser.add_argument("-o", "--output", type=dir_type, metavar="FOLDER_OUTPUT", default=f".",
-                        help="Directory to save the downloaded videos")
+                        help="Directory to save the downloaded videos to")
 
     parser.add_argument("-r", "--recursive", type=argparse.FileType('r'), metavar="FILE_NAME",
-                        help="File containing a list of TikTok URLs to download recursively")
+                        help="File containing a list of TikTok URLs to download")
 
-    parser.add_argument("-d", "--delay", type=int, metavar="DELAY", help="The delay before each download", default=1)
+    parser.add_argument("-d", "--delay", type=int, metavar="DELAY", help="The delay before each download", default=0)
 
     parser.add_argument("-c", "--chunk-size", type=int, metavar="CHUNK_SIZE", help="The write speed of each download",
                         default=1024)

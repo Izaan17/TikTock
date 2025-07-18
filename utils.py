@@ -15,7 +15,7 @@ def select_from_choices(prompt: str, choices: list, allow_multiple: bool = True)
 
         # Get valid user inputx
         try:
-            user_choice = get_int(f"{prompt} (or press 0 to finish): ", 0, len(choices))
+            user_choice = get_int(prompt=f"{prompt} (or press 0 to finish): ", min_bound=0, max_bound=len(choices))
             print()
 
             if user_choice == 0:

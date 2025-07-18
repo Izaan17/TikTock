@@ -15,7 +15,7 @@ class DownloadManager:
     def download(self, urls: list[str], output_path: str, delay: int, chunk_size: int,
                  log_handler: object | None = None) -> None:
         """
-        Downloads many videos with the progress bar with status information and a summary
+        Downloads a list of videos with the progress bar with status information and a summary
         :param urls: The URLs to download
         :param output_path: The output folder
         :param delay: The delay between each download

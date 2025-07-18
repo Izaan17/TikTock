@@ -143,6 +143,6 @@ class URLExtractor:
         Prompts the user to select TikTok activities.
         :return: List of activities
         """
-        print("TikTok User Download Data Detected")
-        print("Please select the following activities to download videos from")
+        print("> TikTok User Download Data Detected")
+        print("> Please select the following activities to download videos from")
         return select_from_choices("Select TikTok activities", TikTokActivityType.get_all_types(), allow_multiple=True)

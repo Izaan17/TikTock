@@ -68,7 +68,7 @@ class TikTokDownloader:
         return bool(re.match(tiktok_pattern, url))
 
     def download(self, url: str, output_path: str, on_progress: Callable[[int, int], None] = None,
-                 chunk_size: int = 1024, delay: int = 1) -> dict[str, object]:
+                 chunk_size: int = 1024, delay: int = 0) -> dict[str, object]:
         """
         Downloads the video from the given TikTok URL and saves it to the specified output path.
         The function optionally reports download progress through the `on_progress` callback and allows configuring

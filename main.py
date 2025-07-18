@@ -19,12 +19,13 @@ def main() -> None:
 
     if args.urls:
         print(f"> TikTok Video Downloader ")
-        print(f"> URLS ({len(args.urls)})")
+        print(f"> Made by Izaan Noman ")
+        print(f"> ({len(args.urls)}) URLS ")
 
         # Create a new list for valid URLs
         valid_urls = []
 
-        for i, url in enumerate(args.urls):
+        for url in args.urls:
             if not tiktok_downloader.valid_url(url):
                 print(f"\t{url} is not a valid TikTok URL!")
             else:
@@ -32,7 +33,7 @@ def main() -> None:
 
         # Update args.urls with the valid URLs only
         args.urls = valid_urls
-        print(f"> Valid URLS ({len(args.urls)})")
+        print(f"> ({len(args.urls)}) Valid URLS")
 
         download_manager.download(valid_urls, args.output, args.delay, args.chunk_size)
 
@@ -41,6 +42,8 @@ def main() -> None:
             urls = URLExtractor.extract_urls_from_file(parser, args.recursive, args)
         except ValueError as e:
             parser.error(f"Error extracting URLs: {e}")
+        except Exception as e:
+            parser.error(f"Oops an unknown error occurred: {e}")
 
         if not urls:
             parser.error(f"No valid URLs found in '{args.recursive.name}'")

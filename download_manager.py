@@ -6,7 +6,7 @@ from tiktok_downloader import TikTokDownloader
 
 
 class DownloadManager:
-    """Class for connecting all components such as displaying, and downloading TikTok videos"""
+    """Connects all components such as displaying, and downloading TikTok videos"""
 
     def __init__(self, display_manager: DisplayManager, tiktok_downloader: TikTokDownloader):
         self.display_manager = display_manager

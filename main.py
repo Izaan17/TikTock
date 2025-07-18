@@ -15,14 +15,13 @@ def main() -> None:
 
     display = DisplayManager()
     tiktok_downloader = TikTokDownloader()
-    download_manager = DownloadManager(display, tiktok_downloader)
+    download_manager = DownloadManager(display_manager=display, tiktok_downloader=tiktok_downloader)
 
     if args.urls:
         print(f"> TikTok Video Downloader ")
         print(f"> Made by Izaan Noman ")
         print(f"> ({len(args.urls)}) URLS ")
 
-        # Create a new list for valid URLs
         valid_urls = []
 
         for url in args.urls:
@@ -31,7 +30,7 @@ def main() -> None:
             else:
                 valid_urls.append(url)
 
-        # Update args.urls with the valid URLs only
+        # Update args.urls with only valid URLs
         args.urls = valid_urls
         print(f"> ({len(args.urls)}) Valid URLS")
 

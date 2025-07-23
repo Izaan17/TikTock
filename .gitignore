@@ -1,3 +1,5 @@
 *.iml
 venv/
 .idea/
+.DS_STORE
+__pycache__/

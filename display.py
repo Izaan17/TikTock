@@ -12,7 +12,7 @@ class DisplayManager:
     def show_progress(self) -> Progress:
         """Initialize and return progress bar instance."""
         return Progress(TextColumn("[bold]Downloading {task.fields[filename]}", justify="right"),
-                        BarColumn(bar_width=None), "[white]{task.percentage:>3.1f}%", TimeRemainingColumn(),
+                        BarColumn(bar_width=None), "[white]{task.percentage:>3.1f}%", TimeRemainingColumn(compact=True),
                         console=self.console)
 
     def show_response_table(self, response: dict) -> None:
@@ -22,6 +22,7 @@ class DisplayManager:
 
     def show_summary(self, completed: list, failed: list) -> None:
         """Display the final download summary."""
+        print()
         self.console.print(self._create_summary_table(completed, failed))
         if failed:
             self.console.print("\n[bold]Details of Failed Downloads:[/]")
@@ -49,10 +50,11 @@ class DisplayManager:
     @staticmethod
     def _create_summary_table(completed: list, failed: list) -> Table:
         """Generate overall summary table."""
-        table = Table(title="Download Summary", show_header=True, header_style="bold")
-        table.add_column("Total URLs", justify="right")
-        table.add_column("Successful", justify="right", style="green")
-        table.add_column("Failed", justify="right", style="red")
+        table = Table(title="Download Summary:", show_header=True, header_style="bold", title_style="bold", expand=True,
+                      title_justify="left")
+        table.add_column("Total URLs")
+        table.add_column("Successful", style="green")
+        table.add_column("Failed", style="red")
         table.add_row(str(len(completed) + len(failed)), str(len(completed)), str(len(failed)))
         return table
 

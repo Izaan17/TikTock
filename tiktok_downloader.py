@@ -90,7 +90,7 @@ class TikTokDownloader:
                  - 'path': The file path where the downloaded content is saved.
                  - 'url': The downloaded videos url.
                  - 'size': (Optional) The total size of the file downloaded if the download succeeds.
-                 - 'Error': (Optional) An error message if the download fails.
+                 - 'error': (Optional) An error message if the download fails.
         """
         try:
             # Get video download URL

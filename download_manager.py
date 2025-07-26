@@ -15,7 +15,7 @@ class DownloadManager:
     @staticmethod
     def extract_video_id(url: str) -> str:
         url = url.rstrip('/')  # Remove any backslashes
-        last_part = url.rsplit('/', 1)[-1]  # Get the last part after final slash
+        last_part = url.rsplit('/', 1)[-1]  # Get the last part after the final slash
         video_id = last_part.split('?', 1)[0]  # Remove query parameters if any
         return video_id
 
@@ -60,7 +60,6 @@ class DownloadManager:
         :param total: The total amount of downloads
         :return: Response dictionary
         """
-        # Ensure the url does not end with '/'
         video_id = self.extract_video_id(url)
         output_file = os.path.join(output_path, f"{video_id}.mp4")
 

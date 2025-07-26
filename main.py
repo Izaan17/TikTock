@@ -18,9 +18,9 @@ def main() -> None:
     download_manager = DownloadManager(display_manager=display, tiktok_downloader=tiktok_downloader)
 
     if args.urls:
-        print(f"> TikTok Video Downloader ")
-        print(f"> Made by Izaan Noman ")
-        print(f"> ({len(args.urls)}) URLS ")
+        print(f"\n> TikTok Video Downloader \n")
+        print(f"[+] Author     : Izaan Noman ")
+        print(f"[+] URLs       : {len(args.urls)}")
 
         valid_urls = []
 
@@ -32,7 +32,7 @@ def main() -> None:
 
         # Update args.urls with only valid URLs
         args.urls = valid_urls
-        print(f"> ({len(args.urls)}) Valid URLS")
+        print(f"[+] Valid URLs : {len(args.urls)}\n")
 
         download_manager.download(valid_urls, args.output, args.delay, args.chunk_size)
 

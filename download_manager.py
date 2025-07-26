@@ -12,6 +12,13 @@ class DownloadManager:
         self.display_manager = display_manager
         self.tiktok_downloader = tiktok_downloader
 
+    @staticmethod
+    def extract_video_id(url: str) -> str:
+        url = url.rstrip('/')  # Remove any backslashes
+        last_part = url.rsplit('/', 1)[-1]  # Get the last part after final slash
+        video_id = last_part.split('?', 1)[0]  # Remove query parameters if any
+        return video_id
+
     def download(self, urls: list[str], output_path: str, delay: int, chunk_size: int,
                  log_handler: object | None = None) -> None:
         """
@@ -54,8 +61,7 @@ class DownloadManager:
         :return: Response dictionary
         """
         # Ensure the url does not end with '/'
-        url = url.rstrip('/')
-        video_id = url.split('/')[-1]
+        video_id = self.extract_video_id(url)
         output_file = os.path.join(output_path, f"{video_id}.mp4")
 
         with self.display_manager.show_progress() as progress:

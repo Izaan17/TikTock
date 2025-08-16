@@ -1,5 +1,6 @@
 import json
 import os.path
+from urllib.parse import urlparse
 
 from display import DisplayManager
 from tiktok_downloader import TikTokDownloader
@@ -14,9 +15,9 @@ class DownloadManager:
 
     @staticmethod
     def extract_video_id(url: str) -> str:
-        url = url.rstrip('/')  # Remove any backslashes
-        last_part = url.rsplit('/', 1)[-1]  # Get the last part after the final slash
-        video_id = last_part.split('?', 1)[0]  # Remove query parameters if any
+        parsed_url = urlparse(url)
+        path = parsed_url.path.rstrip('/')  # remove trailing slash if any
+        video_id = path.split('/')[-1]  # get last part of the path
         return video_id
 
     def download(self, urls: list[str], output_path: str, delay: int, chunk_size: int,

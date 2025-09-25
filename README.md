@@ -217,22 +217,11 @@ To download your personal TikTok data for bulk processing:
 4. 💾 **Download & extract**: Download the zip file and extract it
 5. 🎯 **Use with TikTock**: Use the JSON files with the `-r` option
 
-## 🛠️ Technical Details
-
-### 📦 Dependencies
-
-| Package    | Version | Purpose                                    |
-| ---------- | ------- | ------------------------------------------ |
-| `requests` | 2.32.3  | HTTP requests for video downloading        |
-| `rich`     | 13.9.4  | Beautiful CLI formatting and progress bars |
-
 ### 🔧 System Requirements
 
 - **Operating System**: Windows, macOS, or Linux
 - **Python Version**: 3.8 or higher
 - **Internet**: Stable connection required for downloads
-
----
 
 ## 🐛 Troubleshooting
 

@@ -55,9 +55,9 @@ def main() -> None:
     summary_table.add_column(no_wrap=True)
     summary_table.add_column()
 
-    summary_table.add_row("Total URLs", str(len(urls)))
     summary_table.add_row("Valid URLs", str(len(valid_urls)))
     summary_table.add_row("Invalid URLs", str(len(urls) - len(valid_urls)))
+    summary_table.add_row("Total URLs", str(len(urls)))
     summary_table.add_row("Author", "Izaan Noman")
 
     display.console.print(Panel(summary_table, title="TikTok Video Downloader", expand=True))

@@ -32,7 +32,7 @@ def create_parser() -> argparse.ArgumentParser:
 
     parser.add_argument("--log", type=argparse.FileType('w'), metavar="FILE_NAME",
                         help="Save a JSON log of the completed and failed URLs",
-                        const=f"{datetime.now().strftime("[tiktock] %Y-%m-%d_%H-%M_log.json")}", nargs="?")
+                        const=f"{datetime.now().strftime('[tiktock] %Y-%m-%d_%H-%M_log.json')}", nargs="?")
 
     parser.add_argument(
         "--name-template",

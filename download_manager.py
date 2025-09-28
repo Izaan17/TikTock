@@ -1,9 +1,9 @@
 import json
 import os.path
-from urllib.parse import urlparse
 
 from display import DisplayManager
 from tiktok_downloader import TikTokDownloader
+from tiktok_helpers import extract_video_id
 
 
 class DownloadManager:
@@ -12,13 +12,6 @@ class DownloadManager:
     def __init__(self, display_manager: DisplayManager, tiktok_downloader: TikTokDownloader):
         self.display_manager = display_manager
         self.tiktok_downloader = tiktok_downloader
-
-    @staticmethod
-    def extract_video_id(url: str) -> str:
-        parsed_url = urlparse(url)
-        path = parsed_url.path.rstrip('/')  # remove trailing slash if any
-        video_id = path.split('/')[-1]  # get last part of the path
-        return video_id
 
     def download(self, urls: list[str], output_path: str, delay: int, chunk_size: int,
                  log_handler: object | None = None, filename_from_index: bool = False) -> None:
@@ -64,7 +57,7 @@ class DownloadManager:
         :param total: The total amount of downloads
         :return: Response dictionary
         """
-        file_name = str(file_name) if file_name else self.extract_video_id(url)
+        file_name = str(file_name) if file_name else extract_video_id(url)
         output_file = os.path.join(output_path, f"{file_name}.mp4")
 
         with self.display_manager.show_progress() as progress:

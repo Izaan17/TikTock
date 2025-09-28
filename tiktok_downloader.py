@@ -4,7 +4,7 @@ from typing import Callable
 
 import requests
 
-from tiktok_helpers import get_video_author
+from tiktok_helpers import extract_video_author
 
 
 class TikTokDownloader:
@@ -88,7 +88,7 @@ class TikTokDownloader:
         try:
             # Get video download URL
             video_url = self._get_video_url(url)
-            author = get_video_author(url)
+            author = extract_video_author(url)
 
             # Add delay to avoid rate limiting
             time.sleep(delay)

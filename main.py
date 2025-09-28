@@ -17,28 +17,28 @@ def main() -> None:
     tiktok_downloader = TikTokDownloader()
     download_manager = DownloadManager(display_manager=display, tiktok_downloader=tiktok_downloader)
 
-    all_urls = []
+    urls = []
 
     # Collect URLs from command line
     if args.urls:
-        all_urls.extend(args.urls)
+        urls.extend(args.urls)
 
     # Collect URLs from a file if --recursive is used
     if args.recursive:
         try:
             extracted_urls = URLExtractor.extract_urls_from_file(parser, args.recursive, args)
-            all_urls.extend(extracted_urls)
+            urls.extend(extracted_urls)
         except ValueError as e:
             parser.error(f"Error extracting URLs: {e}")
         except Exception as e:
             parser.error(f"Oops an unknown error occurred: {e}")
 
-    if not all_urls:
+    if not urls:
         parser.error("No URLs provided to download.")
 
     # Validate URLs
     valid_urls = []
-    for url in all_urls:
+    for url in urls:
         if not is_valid_url(url):
             print(f"\t{url} is not a valid TikTok URL!")
         else:
@@ -50,7 +50,7 @@ def main() -> None:
     # Display summary
     print(f"\n> TikTok Video Downloader \n")
     print(f"[+] Author     : Izaan Noman")
-    print(f"[+] URLs       : {len(all_urls)}")
+    print(f"[+] URLs       : {len(urls)}")
     print(f"[+] Valid URLs : {len(valid_urls)}\n")
 
     # Download all valid URLs

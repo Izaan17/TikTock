@@ -33,7 +33,12 @@ class DownloadManager:
         failed = data["failed"]
         try:
             for i, url in enumerate(urls, start=1):
-                file_name = parse_filename_template(i, url, filename_template) if filename_template else None
+                try:
+                    file_name = parse_filename_template(i, url, filename_template) if filename_template else None
+                except ValueError:
+                    self.display_manager.console.print("\n[bold red]Error parsing filename template[/]")
+                    quit(1)
+
                 response = self._download_video(url, output_path, delay, chunk_size, i, len(urls),
                                                 file_name=file_name)
                 self.display_manager.show_response_table(response)

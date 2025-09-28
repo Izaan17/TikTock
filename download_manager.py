@@ -21,7 +21,7 @@ class DownloadManager:
         return video_id
 
     def download(self, urls: list[str], output_path: str, delay: int, chunk_size: int,
-                 log_handler: object | None = None) -> None:
+                 log_handler: object | None = None, filename_from_index: bool = False) -> None:
         """
         Downloads a list of videos with the progress bar with status information and a summary
         :param urls: The URLs to download
@@ -29,6 +29,7 @@ class DownloadManager:
         :param delay: The delay between each download
         :param chunk_size: The chunk size write speed
         :param log_handler: If provided writes a log file of the completed and failed downloads
+        :param filename_from_index: If True, filenames are generated from the index instead of the video ID
         :return: None
         """
         data = {"completed": [], "failed": []}
@@ -36,7 +37,8 @@ class DownloadManager:
         failed = data["failed"]
         try:
             for i, url in enumerate(urls, start=1):
-                response = self._download_video(url, output_path, delay, chunk_size, i, len(urls))
+                response = self._download_video(url, output_path, delay, chunk_size, i, len(urls),
+                                                file_name=str(i) if filename_from_index else None)
                 self.display_manager.show_response_table(response)
                 if response['success']:
                     completed.append(url)
@@ -50,7 +52,8 @@ class DownloadManager:
         if log_handler:
             json.dump(data, log_handler)
 
-    def _download_video(self, url: str, output_path: str, delay: int, chunk_size: int, index: int, total: int) -> dict:
+    def _download_video(self, url: str, output_path: str, delay: int, chunk_size: int, index: int, total: int,
+                        file_name: str | None = None) -> dict:
         """
         Downloads a video with the display managers progress bar
         :param url: The url to download
@@ -61,8 +64,8 @@ class DownloadManager:
         :param total: The total amount of downloads
         :return: Response dictionary
         """
-        video_id = self.extract_video_id(url)
-        output_file = os.path.join(output_path, f"{video_id}.mp4")
+        file_name = str(file_name) if file_name else self.extract_video_id(url)
+        output_file = os.path.join(output_path, f"{file_name}.mp4")
 
         with self.display_manager.show_progress() as progress:
             task = progress.add_task("download", filename=f"{index} of {total}")

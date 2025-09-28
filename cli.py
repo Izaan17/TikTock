@@ -33,4 +33,10 @@ def create_parser() -> argparse.ArgumentParser:
                         help="Save a JSON log of the completed and failed URLs",
                         const=f"{datetime.now().strftime("[tiktock] %Y-%m-%d_%H-%M_log.json")}", nargs="?")
 
+    parser.add_argument(
+        "--use-index",
+        action="store_true",
+        help="Use the download index as the filename instead of the TikTok video ID"
+    )
+
     return parser

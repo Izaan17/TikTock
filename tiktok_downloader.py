@@ -4,6 +4,8 @@ from typing import Callable
 
 import requests
 
+from tiktok_helpers import get_video_author
+
 
 class TikTokDownloader:
     """Handles all TikTok related things such as downloading videos."""
@@ -59,25 +61,6 @@ class TikTokDownloader:
         except Exception as e:
             raise Exception(e)
 
-    @staticmethod
-    def _get_video_author(url: str) -> str:
-        # Use regex to capture the username in the URL
-        match = re.search(r"@([a-zA-Z0-9_]+)", url)
-        if match:
-            return match.group(1)
-
-        return "Unknown"
-
-    @staticmethod
-    def valid_url(url: str) -> bool:
-        """
-        Validate the given URL if it is a TikTok URL.
-        :param url: URL to validate
-        :return: True if a TikTok URL, False otherwise
-        """
-        tiktok_pattern = r'https?://((?:vm|vt|www|v)\.)?tiktok(?:v)?\.com/.*'
-        return bool(re.match(tiktok_pattern, url))
-
     def download(self, url: str, output_path: str, on_progress: Callable[[int, int], None] = None,
                  chunk_size: int = 1024, delay: int = 0) -> dict[str, object]:
         """
@@ -105,7 +88,7 @@ class TikTokDownloader:
         try:
             # Get video download URL
             video_url = self._get_video_url(url)
-            author = self._get_video_author(url)
+            author = get_video_author(url)
 
             # Add delay to avoid rate limiting
             time.sleep(delay)

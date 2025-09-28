@@ -3,7 +3,7 @@ import os
 from typing import TextIO
 
 from models import TikTokActivityType
-from tiktok_downloader import TikTokDownloader
+from tiktok_helpers import is_valid_url
 from utils import select_from_choices
 
 
@@ -26,7 +26,7 @@ class JSONExtractor:
         :param data: The parsed JSON data
         :return: The valid TikTok URLs in the data
         """
-        return [url for url in data.get('urls', []) if TikTokDownloader.valid_url(url)]
+        return [url for url in data.get('urls', []) if is_valid_url(url)]
 
     def extract_from_tiktok_format(self, data: dict, activity_type: TikTokActivityType) -> list[str]:
         """
@@ -63,7 +63,7 @@ class JSONExtractor:
         video_url_key = 'Link' if activity_type == TikTokActivityType.FAVORITES else 'link'
 
         return [video.get(video_url_key) for video in activity_section.get(key, []) if
-                TikTokDownloader.valid_url(video.get(video_url_key))]
+                is_valid_url(video.get(video_url_key))]
 
 
 class TextExtractor:
@@ -76,7 +76,7 @@ class TextExtractor:
         :param file_handler: The file handler
         :return: The valid TikTok URLs in the text file
         """
-        return [url.strip() for url in file_handler.readlines() if TikTokDownloader.valid_url(url.strip())]
+        return [url.strip() for url in file_handler.readlines() if is_valid_url(url.strip())]
 
 
 class URLExtractor:

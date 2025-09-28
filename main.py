@@ -3,6 +3,7 @@ from display import DisplayManager
 from download_manager import DownloadManager
 from extractors import URLExtractor
 from tiktok_downloader import TikTokDownloader
+from tiktok_helpers import is_valid_url
 
 
 def main() -> None:
@@ -38,7 +39,7 @@ def main() -> None:
     # Validate URLs
     valid_urls = []
     for url in all_urls:
-        if not tiktok_downloader.valid_url(url):
+        if not is_valid_url(url):
             print(f"\t{url} is not a valid TikTok URL!")
         else:
             valid_urls.append(url)

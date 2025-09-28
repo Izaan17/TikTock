@@ -52,7 +52,7 @@ def main() -> None:
 
     # Display summary
     summary_table = Table.grid(padding=(0, 2))
-    summary_table.add_column(justify="right", no_wrap=True)
+    summary_table.add_column(no_wrap=True)
     summary_table.add_column()
 
     summary_table.add_row("Total URLs", str(len(urls)))

@@ -1,4 +1,5 @@
 from rich.console import Console
+from rich.panel import Panel
 from rich.progress import Progress, BarColumn, TextColumn, TimeRemainingColumn
 from rich.table import Table
 
@@ -24,7 +25,7 @@ class DisplayManager:
     def show_summary(self, completed: list, failed: list) -> None:
         """Display the final download summary."""
         print()
-        self.console.print(self._create_summary_table(completed, failed))
+        self.console.print(self._create_summary_panel(completed, failed))
         if failed:
             self.console.print("\n[bold]Details of Failed Downloads:[/]")
             self.console.print(self._create_failed_table(failed))
@@ -66,15 +67,32 @@ class DisplayManager:
         return table
 
     @staticmethod
-    def _create_summary_table(completed: list, failed: list) -> Table:
-        """Generate overall summary table."""
-        table = Table(title="Download Summary:", show_header=True, header_style="bold", title_style="bold", expand=True,
-                      title_justify="left")
-        table.add_column("Total URLs")
-        table.add_column("Successful", style="green")
-        table.add_column("Failed", style="red")
-        table.add_row(str(len(completed) + len(failed)), str(len(completed)), str(len(failed)))
-        return table
+    def _create_summary_panel(completed: list, failed: list) -> Panel:
+        """Generate a styled download summary panel with statistics displayed side-by-side."""
+
+        total = len(completed) + len(failed)
+
+        # Create a grid with 3 columns for side-by-side display
+        summary = Table.grid(expand=True)
+        summary.add_column(justify="center", min_width=12)
+        summary.add_column(justify="center", min_width=12)
+        summary.add_column(justify="center", min_width=12)
+
+        # Add the row with statistics, using selective color coding
+        summary.add_row(
+            f"[bold green]Successful[/bold green]\n[green]{len(completed)}[/green]",
+            f"[bold red]Failed[/bold red]\n[red]{len(failed)}[/red]",
+            f"[bold]Total[/bold]\n{total}"
+        )
+
+        # Clean panel styling without colors
+        return Panel(
+            summary,
+            title="[bold]Download Summary[/bold]",
+            title_align="center",
+            expand=True,
+            padding=(1, 2)
+        )
 
     @staticmethod
     def _create_failed_table(failed: list) -> Table:

@@ -5,6 +5,13 @@ from tiktok_helpers import extract_video_author, extract_video_id
 
 
 def select_from_choices(prompt: str, choices: list, allow_multiple: bool = True) -> list:
+    """
+    Select from a list of options.
+    :param prompt: The prompt to display to the user
+    :param choices: The list of valid choices
+    :param allow_multiple:  If True, allows the selection of multiple choices
+    :return: The selected choice(s)
+    """
     selected = []
 
     # Display choices

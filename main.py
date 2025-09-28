@@ -1,3 +1,6 @@
+from rich.panel import Panel
+from rich.table import Table
+
 from cli import create_parser
 from display import DisplayManager
 from download_manager import DownloadManager
@@ -48,10 +51,17 @@ def main() -> None:
         parser.error("No valid TikTok URLs to download.")
 
     # Display summary
-    print(f"\n> TikTok Video Downloader \n")
-    print(f"[+] Author     : Izaan Noman")
-    print(f"[+] URLs       : {len(urls)}")
-    print(f"[+] Valid URLs : {len(valid_urls)}\n")
+    summary_table = Table.grid(padding=(0, 2))
+    summary_table.add_column(justify="right", no_wrap=True)
+    summary_table.add_column()
+
+    summary_table.add_row("Total URLs", str(len(urls)))
+    summary_table.add_row("Valid URLs", str(len(valid_urls)))
+    summary_table.add_row("Invalid URLs", str(len(urls) - len(valid_urls)))
+    summary_table.add_row("Author", "Izaan Noman")
+
+    display.console.print(Panel(summary_table, title="TikTok Video Downloader", expand=True))
+    display.console.print()
 
     # Download all valid URLs
     download_manager.download(

@@ -26,7 +26,9 @@ class DownloadManager:
         :param filename_template: Template to design the file name
         :return: None
         """
-        data = {"completed": [], "failed": []}
+        data = {"total": len(urls), "output": output_path, "delay": delay, "chunk_size": chunk_size,
+                "filename_template": filename_template if filename_template else "None",
+                "completed": [], "failed": []}
         completed = data["completed"]
         failed = data["failed"]
         try:
@@ -45,7 +47,7 @@ class DownloadManager:
         self.display_manager.show_summary(completed, failed)
 
         if log_handler:
-            json.dump(data, log_handler)
+            json.dump(data, log_handler, indent=4)
 
     def _download_video(self, url: str, output_path: str, delay: int, chunk_size: int, index: int, total: int,
                         file_name: str | None = None) -> dict:

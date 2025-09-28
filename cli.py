@@ -10,7 +10,8 @@ def create_parser() -> argparse.ArgumentParser:
     Creates the parser with arguments.
     :return: The configured parser
     """
-    parser = argparse.ArgumentParser(description="TikTok Video Downloader")
+    parser = argparse.ArgumentParser(description="TikTok Video Downloader",
+                                     formatter_class=argparse.RawTextHelpFormatter)
     # Positional arguments
     parser.add_argument("urls", nargs="*", metavar="TIKTOK_URLS", help="List of TikTok video URLs")
 
@@ -34,9 +35,21 @@ def create_parser() -> argparse.ArgumentParser:
                         const=f"{datetime.now().strftime("[tiktock] %Y-%m-%d_%H-%M_log.json")}", nargs="?")
 
     parser.add_argument(
-        "--use-index",
-        action="store_true",
-        help="Use the download index as the filename instead of the TikTok video ID"
+        "--name-template",
+        type=str,
+        metavar="TEMPLATE",
+        help=(
+            "Custom filename template for downloaded videos.\n"
+            "Placeholders:\n"
+            "  {index}    = video number\n"
+            "  {video_id} = TikTok video ID\n"
+            "  {author}   = username\n"
+            "  {cdate}    = current date/time (default YYYY-MM-DD_HH-MM-SS)\n"
+            "You can customize the date format using strftime syntax, e.g.\n"
+            "  '{author}_{video_id}_{cdate:%%Y-%%m-%%d-%%H-%%M-%%S}'\n"
+            "Example template:\n"
+            "  '{index}_{author}_{video_id}_{cdate}'"
+        )
     )
 
     return parser

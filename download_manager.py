@@ -4,6 +4,7 @@ import os.path
 from display import DisplayManager
 from tiktok_downloader import TikTokDownloader
 from tiktok_helpers import extract_video_id
+from utils import parse_filename_template
 
 
 class DownloadManager:
@@ -14,7 +15,7 @@ class DownloadManager:
         self.tiktok_downloader = tiktok_downloader
 
     def download(self, urls: list[str], output_path: str, delay: int, chunk_size: int,
-                 log_handler: object | None = None, filename_from_index: bool = False) -> None:
+                 log_handler: object | None = None, filename_template: str | None = None) -> None:
         """
         Downloads a list of videos with the progress bar with status information and a summary
         :param urls: The URLs to download
@@ -22,7 +23,7 @@ class DownloadManager:
         :param delay: The delay between each download
         :param chunk_size: The chunk size write speed
         :param log_handler: If provided writes a log file of the completed and failed downloads
-        :param filename_from_index: If True, filenames are generated from the index instead of the video ID
+        :param filename_template: Template to design the file name
         :return: None
         """
         data = {"completed": [], "failed": []}
@@ -30,8 +31,9 @@ class DownloadManager:
         failed = data["failed"]
         try:
             for i, url in enumerate(urls, start=1):
+                file_name = parse_filename_template(i, url, filename_template) if filename_template else None
                 response = self._download_video(url, output_path, delay, chunk_size, i, len(urls),
-                                                file_name=str(i) if filename_from_index else None)
+                                                file_name=file_name)
                 self.display_manager.show_response_table(response)
                 if response['success']:
                     completed.append(url)

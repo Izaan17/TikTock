@@ -1,3 +1,9 @@
+import datetime
+import string
+
+from tiktok_helpers import extract_video_author, extract_video_id
+
+
 def select_from_choices(prompt: str, choices: list, allow_multiple: bool = True) -> list:
     selected = []
 
@@ -47,3 +53,46 @@ def get_int(prompt: str, min_bound: int, max_bound: int) -> int:
                 print(f"Please input an integer between {min_bound} and {max_bound}.")
         except ValueError:
             print(f"Invalid input. Please input an integer between {min_bound} and {max_bound}.")
+
+
+DEFAULT_DATETIME_FORMAT = "%Y-%m-%d_%H-%M-%S"
+
+
+class SafeFormatter(string.Formatter):
+    def __init__(self, values: dict):
+        self.values = values
+
+    def get_value(self, key, args, kwargs):
+        # Handle missing keys gracefully
+        if isinstance(key, str):
+            return self.values.get(key, f"{{{key}}}")
+        return super().get_value(key, args, kwargs)
+
+    def format_field(self, value, format_spec):
+        # Handle datetime formatting with or without format_spec
+        if isinstance(value, datetime.datetime):
+            if format_spec:
+                return value.strftime(format_spec)
+            else:
+                return value.strftime(DEFAULT_DATETIME_FORMAT)
+        return super().format_field(value, format_spec)
+
+
+def parse_filename_template(index: int, url: str, template: str) -> str:
+    """
+    Fill a filename template using metadata, with support for default and custom datetime formats.
+    :param index:
+    :param url:
+    :param template:
+    :return:
+    """
+
+    placeholders = {
+        "index": index,
+        "author": extract_video_author(url),
+        "id": extract_video_id(url),
+        "cdate": datetime.datetime.now()
+    }
+
+    formatter = SafeFormatter(placeholders)
+    return formatter.format(template, **placeholders)

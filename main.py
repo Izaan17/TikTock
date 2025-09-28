@@ -60,7 +60,7 @@ def main() -> None:
         args.delay,
         args.chunk_size,
         log_handler=args.log,
-        filename_from_index=args.use_index
+        filename_template=args.name_template
     )
 
 

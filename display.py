@@ -19,6 +19,7 @@ class DisplayManager:
         """Display single download result table."""
         table = self._create_response_table(response)
         self.console.print(table)
+        print()
 
     def show_summary(self, completed: list, failed: list) -> None:
         """Display the final download summary."""
@@ -30,6 +31,22 @@ class DisplayManager:
             self.console.print(f"[bold]Total[/]: {len(failed)} videos failed\n")
 
     @staticmethod
+    def format_size(size_in_bytes: int) -> str:
+        """
+        Convert size in bytes to a human-readable format (KB, MB, GB, etc.).
+        """
+        units = ['B', 'KB', 'MB', 'GB', 'TB']
+        size = size_in_bytes
+        unit_index = 0
+
+        while size >= 1024 and unit_index < len(units) - 1:
+            size /= 1024
+            unit_index += 1
+
+        # Round the size to 2 decimal places and return the formatted string
+        return f"{size:.2f} {units[unit_index]}"
+
+    @staticmethod
     def _create_response_table(response: dict) -> Table:
         """Generate table for a single download result."""
         success = '✓' if response.get('success') else '𐄂'
@@ -38,10 +55,11 @@ class DisplayManager:
         table = Table(show_header=False, box=None)
         table.add_column(style="bold")
 
-        table.add_row("Status:", f"[bold {status_color}]{success}[/]")
-        table.add_row("URL:", response.get('url', 'None'))
-        table.add_row("Output:", response.get('path', 'None'))
-        table.add_row("Size:", str(response.get('size', 'None')))
+        table.add_row("URL", response.get('url', 'None'))
+        table.add_row("Author", response.get('author', 'Unknown'))
+        table.add_row("Size", DisplayManager.format_size(int(response.get('size', 0))))
+        table.add_row("Output", response.get('path', 'None'))
+        table.add_row("Status", f"[bold {status_color}]{success}[/]")
         if error := response.get('error'):
             table.add_row("[red]Error[/]:", error)
 

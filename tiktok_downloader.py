@@ -60,6 +60,15 @@ class TikTokDownloader:
             raise Exception(e)
 
     @staticmethod
+    def _get_video_author(url: str) -> str:
+        # Use regex to capture the username in the URL
+        match = re.search(r"@([a-zA-Z0-9_]+)", url)
+        if match:
+            return match.group(1)
+
+        return "Unknown"
+
+    @staticmethod
     def valid_url(url: str) -> bool:
         """
         Validate the given URL if it is a TikTok URL.
@@ -96,6 +105,7 @@ class TikTokDownloader:
         try:
             # Get video download URL
             video_url = self._get_video_url(url)
+            author = self._get_video_author(url)
 
             # Add delay to avoid rate limiting
             time.sleep(delay)
@@ -117,7 +127,7 @@ class TikTokDownloader:
                         if on_progress and total_size:
                             on_progress(bytes_downloaded, total_size)
 
-            return {'success': True, 'path': output_path, 'size': total_size, 'url': url}
+            return {'success': True, 'path': output_path, 'size': total_size, 'url': url, 'author': author}
 
         except Exception as e:
             return {'success': False, 'error': str(e), 'url': url}

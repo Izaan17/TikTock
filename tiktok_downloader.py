@@ -82,6 +82,7 @@ class TikTokDownloader:
                  - 'success': A boolean indicating the result of the download process.
                  - 'path': The file path where the downloaded content is saved.
                  - 'url': The downloaded videos url.
+                 - 'author': (Optional) The videos author.
                  - 'size': (Optional) The total size of the file downloaded if the download succeeds.
                  - 'error': (Optional) An error message if the download fails.
         """

@@ -1,3 +1,5 @@
+<div align="center">
+
 # TikTock - TikTok Video Downloader
 
 A powerful Python tool for downloading TikTok videos efficiently and safely.
@@ -7,6 +9,8 @@ A powerful Python tool for downloading TikTok videos efficiently and safely.
 [![Forks](https://img.shields.io/github/forks/izaan17/TikTock.svg)](https://github.com/izaan17/TikTock/network)
 
 [Quick Start](#quick-start) • [Features](#features) • [Installation](#installation) • [Usage](#usage) • [Contributing](#contributing)
+
+</div>
 
 ## Overview
 

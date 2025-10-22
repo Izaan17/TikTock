@@ -349,10 +349,10 @@ To download your personal TikTok data for bulk processing:
 
 ## Contributions
 
-<a href="https://github.com/hatchcanon" style="display: flex; align-items: center; text-decoration: none;">
-  <img src="https://avatars.githubusercontent.com/u/10931888?v=4" alt="Hatch canon" width="35" height="35" style="border-radius: 50%;" />
-  <span style="margin-left: 10px; color: inherit;">Hatch canon</span>
-</a>
+| [![Hatch canon](https://avatars.githubusercontent.com/u/10931888?v=4&s=80)](https://github.com/hatchcanon) |
+|:--:|
+| [Hatch canon](https://github.com/hatchcanon) |
+
 
 
 Contributions are welcome!

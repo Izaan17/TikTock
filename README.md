@@ -14,7 +14,9 @@ A powerful Python tool for downloading TikTok videos efficiently and safely.
 
 ## Overview
 
-TikTock is a robust Python-based command-line tool designed to download TikTok videos efficiently and safely. Whether you want to save a single video or bulk download from your TikTok data export, TikTock provides an intuitive interface with powerful features.
+TikTock is a robust Python-based command-line tool designed to download TikTok videos efficiently and safely. Whether
+you want to save a single video or bulk download from your TikTok data export, TikTock provides an intuitive interface
+with powerful features.
 
 ## Features
 
@@ -128,7 +130,7 @@ python main.py -r user_data.json
 ### Advanced Options
 
 | Option            | Short | Description                                  | Example                                      |
-| ----------------- | ----- | -------------------------------------------- | -------------------------------------------- |
+|-------------------|-------|----------------------------------------------|----------------------------------------------|
 | `--output`        | `-o`  | Output directory                             | `-o ./downloads`                             |
 | `--recursive`     | `-r`  | Process URLs from file                       | `-r urls.txt`                                |
 | `--delay`         | `-d`  | Delay between downloads (seconds)            | `-d 2`                                       |
@@ -142,7 +144,7 @@ python main.py -r user_data.json
 TikTock allows you to customize your downloaded filenames using placeholders:
 
 | Template                                        | Example Output                                         | Description                                             |
-| ----------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------- |
+|-------------------------------------------------|--------------------------------------------------------|---------------------------------------------------------|
 | `{index}`                                       | `1.mp4`                                                | Index of the video in the current download session      |
 | `{video_id}`                                    | `7554364340145523999.mp4`                              | TikTok video ID extracted from the URL                  |
 | `{author}`                                      | `izaannyc.mp4`                                         | TikTok username of the video's author                   |
@@ -234,7 +236,8 @@ https://www.tiktok.com/@user3/video/1122334455
 
 To download your personal TikTok data for bulk processing:
 
-1. **Request your data**: Visit [TikTok's data download page](https://support.tiktok.com/en/account-and-privacy/personalized-ads-and-data/requesting-your-data)
+1. **Request your data**:
+   Visit [TikTok's data download page](https://support.tiktok.com/en/account-and-privacy/personalized-ads-and-data/requesting-your-data)
 2. **Choose JSON format**: Select JSON format (TXT format is not currently supported)
 3. **Wait for email**: TikTok will email you when your data is ready
 4. **Download & extract**: Download the zip file and extract it
@@ -309,7 +312,8 @@ https://www.tiktok.com/@user3/video/1122334455
 
 To download your personal TikTok data for bulk processing:
 
-1. **Request your data**: Visit [TikTok's data download page](https://support.tiktok.com/en/account-and-privacy/personalized-ads-and-data/requesting-your-data)
+1. **Request your data**:
+   Visit [TikTok's data download page](https://support.tiktok.com/en/account-and-privacy/personalized-ads-and-data/requesting-your-data)
 2. **Choose JSON format**: Select JSON format (TXT format is not currently supported)
 3. **Wait for email**: TikTok will email you when your data is ready
 4. **Download & extract**: Download the zip file and extract it
@@ -343,7 +347,13 @@ To download your personal TikTok data for bulk processing:
 - Try reducing chunk size: `-c 512`
 - Add delay between downloads: `-d 3`
 
-## Contributing
+## Contributions
+
+<a style="display: flex; align-items: center;" href="https://github.com/hatchcanon">
+  <img src="https://avatars.githubusercontent.com/u/10931888?v=4" alt="Contributor Photo" width="35" height="35" style="border-radius: 20px;" />
+  <p style="margin-left: 10px;">Hatch canon</p>
+</a>
+
 
 Contributions are welcome!
 

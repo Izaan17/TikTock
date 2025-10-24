@@ -95,10 +95,10 @@ class SafeFormatter(string.Formatter):
 def parse_filename_template(index: int, url: str, template: str) -> str:
     """
     Fill a filename template using metadata, with support for default and custom datetime formats.
-    :param index:
-    :param url:
-    :param template:
-    :return:
+    :param index: The index of the current download
+    :param url: The url that is being parsed from
+    :param template: The file name template
+    :return: Parsed string
     """
 
     placeholders = {

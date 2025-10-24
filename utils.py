@@ -51,6 +51,13 @@ def select_from_choices(prompt: str, choices: list, allow_multiple: bool = True)
 
 
 def get_int(prompt: str, min_bound: int, max_bound: int) -> int:
+    """
+    Prompt the user for an integer between the min and max bound set.
+    :param prompt: The prompt to ask the user
+    :param min_bound: The minimum allowed number (inclusive)
+    :param max_bound: The maximum allowed number (inclusive)
+    :return: A number between the min and max bound
+    """
     while True:
         try:
             user_input = int(input(prompt))

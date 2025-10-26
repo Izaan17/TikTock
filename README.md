@@ -249,82 +249,6 @@ To download your personal TikTok data for bulk processing:
 - **Python Version**: 3.8 or higher
 - **Internet**: Stable connection required for downloads
 
-## Supported File Formats
-
-### Text Files (`.txt`)
-
-Simple text files with one TikTok URL per line:
-
-```
-https://www.tiktok.com/@user1/video/1234567890
-https://www.tiktok.com/@user2/video/0987654321
-https://www.tiktok.com/@user3/video/1122334455
-```
-
-### JSON Files
-
-#### Liked Videos (TikTok Export Format)
-
-```json
-{
-  "Activity": {
-    "Like List": {
-      "ItemFavoriteList": [
-        {
-          "date": "2025-01-01",
-          "link": "https://www.tiktok.com/@username/video/1234567890"
-        }
-      ]
-    }
-  }
-}
-```
-
-#### Favorite Videos (TikTok Export Format)
-
-```json
-{
-  "Activity": {
-    "Favorite Videos": {
-      "FavoriteVideoList": [
-        {
-          "Date": "2025-01-01",
-          "Link": "https://www.tiktok.com/@username/video/1234567890"
-        }
-      ]
-    }
-  }
-}
-```
-
-#### Custom JSON Format
-
-```json
-{
-  "urls": [
-    "https://www.tiktok.com/@username/video/1234567890",
-    "https://www.tiktok.com/@username/video/0987654321"
-  ]
-}
-```
-
-## Getting Your TikTok Data
-
-To download your personal TikTok data for bulk processing:
-
-1. **Request your data**:
-   Visit [TikTok's data download page](https://support.tiktok.com/en/account-and-privacy/personalized-ads-and-data/requesting-your-data)
-2. **Choose JSON format**: Select JSON format (TXT format is not currently supported)
-3. **Wait for email**: TikTok will email you when your data is ready
-4. **Download & extract**: Download the zip file and extract it
-5. **Use with TikTock**: Use the JSON files with the `-r` option
-
-### System Requirements
-
-- **Operating System**: Windows, macOS, or Linux
-- **Python Version**: 3.8 or higher
-- **Internet**: Stable connection required for downloads
-
 ## Troubleshooting
 
 ### Common Issues
@@ -350,8 +274,8 @@ To download your personal TikTok data for bulk processing:
 ## Contributions
 
 | [![Hatch canon](https://avatars.githubusercontent.com/u/10931888?v=4&s=80)](https://github.com/hatchcanon) |
-|:--:|
-| [Hatch canon](https://github.com/hatchcanon) |
+|:----------------------------------------------------------------------------------------------------------:|
+|                                [Hatch canon](https://github.com/hatchcanon)                                |
 
 
 
